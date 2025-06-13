@@ -27,7 +27,7 @@ public class UsuarioService {
         repository.deleteById(id);
     }
 
-    public Optional<Usuario> logar(String email, String senha) {
-        return repository.findByEmailAndSenha(email, senha);
+    public Optional<Usuario> logar(LoginDTO login) {
+        return repository.findByEmailAndSenha(login.getEmail(), login.getSenha());
     }
 }

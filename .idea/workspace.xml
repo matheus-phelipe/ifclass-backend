@@ -5,19 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b13bd71-17e7-4994-bcb0-b6f8d0fad216" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/jpa.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/ifclass.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/model/Curso.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/model/Curso.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/controller/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/controller/UsuarioController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/model/Usuario.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/model/Usuario.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/repository/UsuarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/repository/UsuarioRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/service/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/service/UsuarioService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,11 +87,6 @@
           <url>file://$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/service/CursoService.java</url>
           <line>19</line>
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/controller/UsuarioController.java</url>
-          <line>32</line>
-          <option name="timeStamp" value="6" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
