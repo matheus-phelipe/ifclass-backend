@@ -1,11 +1,13 @@
 package com.ifclass.ifclass.usuario.service;
 
 import com.ifclass.ifclass.usuario.model.Usuario;
+import com.ifclass.ifclass.usuario.model.dto.LoginDTO;
 import com.ifclass.ifclass.usuario.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioService {
@@ -23,5 +25,9 @@ public class UsuarioService {
 
     public void excluir(Long id) {
         repository.deleteById(id);
+    }
+
+    public Optional<Usuario> logar(String email, String senha) {
+        return repository.findByEmailAndSenha(email, senha);
     }
 }

@@ -6,7 +6,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,5 +20,6 @@ public class Usuario {
     private String nome;
     private String email;
     private String senha;
+    private String prontuario;
     private Long permissao;
 }
