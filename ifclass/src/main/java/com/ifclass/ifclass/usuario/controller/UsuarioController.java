@@ -27,8 +27,15 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public Usuario salvar(@RequestBody Usuario usuario) {
-        return service.salvar(usuario);
+    public ResponseEntity<?> cadastrar(@RequestBody Usuario usuario) {
+        try {
+            Usuario novoUsuario = service.cadastrar(usuario);
+            return ResponseEntity.status(201).body(novoUsuario);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(409).body(e.getMessage()); // 409 Conflict
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro interno");
+        }
     }
 
     @PostMapping("/login")

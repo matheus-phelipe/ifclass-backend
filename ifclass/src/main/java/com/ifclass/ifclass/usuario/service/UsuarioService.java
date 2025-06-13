@@ -4,6 +4,7 @@ import com.ifclass.ifclass.usuario.model.Usuario;
 import com.ifclass.ifclass.usuario.model.dto.LoginDTO;
 import com.ifclass.ifclass.usuario.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +20,13 @@ public class UsuarioService {
         return repository.findAll();
     }
 
-    public Usuario salvar(Usuario usuario) {
+    public Usuario cadastrar(Usuario usuario) {
+        if (repository.findByEmail(usuario.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email já cadastrado");
+        }
+
+        var encoder = new BCryptPasswordEncoder();
+        usuario.setSenha(encoder.encode(usuario.getSenha()));
         return repository.save(usuario);
     }
 
@@ -28,6 +35,17 @@ public class UsuarioService {
     }
 
     public Optional<Usuario> logar(LoginDTO login) {
-        return repository.findByEmailAndSenha(login.getEmail(), login.getSenha());
+        Optional<Usuario> usuarioOpt = repository.findByEmail(login.getEmail());
+
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+            if (encoder.matches(login.getSenha(), usuario.getSenha())) {
+                return Optional.of(usuario);
+            }
+        }
+
+        return Optional.empty(); // E-mail não existe ou senha incorreta
     }
 }
