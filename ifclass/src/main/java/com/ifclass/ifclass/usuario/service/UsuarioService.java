@@ -2,6 +2,7 @@ package com.ifclass.ifclass.usuario.service;
 
 import com.ifclass.ifclass.usuario.model.Usuario;
 import com.ifclass.ifclass.usuario.model.dto.LoginDTO;
+import com.ifclass.ifclass.usuario.model.dto.RoleUsuario;
 import com.ifclass.ifclass.usuario.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,7 +28,13 @@ public class UsuarioService {
 
         var encoder = new BCryptPasswordEncoder();
         usuario.setSenha(encoder.encode(usuario.getSenha()));
-        return repository.save(usuario);
+
+        usuario.setPermissao(String.valueOf(RoleUsuario.ROLE_ALUNO));
+
+        repository.save(usuario);
+        usuario.setSenha(null);
+
+        return usuario;
     }
 
     public void excluir(Long id) {

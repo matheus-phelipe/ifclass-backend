@@ -21,5 +21,5 @@ public class Usuario {
     private String email;
     private String senha;
     private String prontuario;
-    private Long permissao;
+    private String permissao;
 }

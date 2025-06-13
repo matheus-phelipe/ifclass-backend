@@ -45,7 +45,7 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
         }
 
-        String token = JwtUtil.generateToken(usuario.get().getEmail());
+        String token = JwtUtil.generateToken(usuario.get().getEmail(), usuario.get().getPermissao());
         return ResponseEntity.ok().body(Map.of("token", token));
     }
 

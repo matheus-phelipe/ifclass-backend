@@ -6,13 +6,15 @@ import io.jsonwebtoken.security.Keys;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 
 public class JwtUtil {
     private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    public static String generateToken(String email) {
+    public static String generateToken(String email, String permissao) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("authorities", List.of(permissao))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 dia
                 .signWith(key)
