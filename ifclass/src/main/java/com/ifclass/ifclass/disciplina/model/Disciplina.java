@@ -1,10 +1,7 @@
 package com.ifclass.ifclass.disciplina.model;
 
 import com.ifclass.ifclass.curso.model.Curso;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
@@ -22,6 +19,10 @@ public class Disciplina {
     private Long id;
 
     private String nome;
+
+
+    @ManyToOne
+    @JoinColumn(name = "idcurso")
     private Curso curso;
     private Integer cargaHorario;
 }
