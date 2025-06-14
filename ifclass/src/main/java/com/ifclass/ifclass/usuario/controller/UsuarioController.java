@@ -45,12 +45,22 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
         }
 
-        String token = JwtUtil.generateToken(usuario.get().getEmail(), usuario.get().getPermissao());
+        String token = JwtUtil.generateToken(usuario.get().getEmail(), usuario.get().getAuthorities());
         return ResponseEntity.ok().body(Map.of("token", token));
     }
 
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Long id) {
         service.excluir(id);
+    }
+
+    @PatchMapping("/{id}/authority")
+    public ResponseEntity<Usuario> atualizarAuthority(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request
+    ) {
+        String novaAuthority = request.get("authorities");
+        Usuario atualizado = service.atualizarAuthority(id, novaAuthority);
+        return ResponseEntity.ok(atualizado);
     }
 }
