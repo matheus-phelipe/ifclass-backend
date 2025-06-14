@@ -4,6 +4,7 @@ import com.ifclass.ifclass.usuario.model.Usuario;
 import com.ifclass.ifclass.usuario.model.dto.LoginDTO;
 import com.ifclass.ifclass.usuario.model.dto.RoleUsuario;
 import com.ifclass.ifclass.usuario.repository.UsuarioRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class UsuarioService {
         var encoder = new BCryptPasswordEncoder();
         usuario.setSenha(encoder.encode(usuario.getSenha()));
 
-        usuario.setPermissao(String.valueOf(RoleUsuario.ROLE_ALUNO));
+        usuario.setAuthorities(String.valueOf(RoleUsuario.ROLE_ALUNO));
 
         repository.save(usuario);
         usuario.setSenha(null);
@@ -54,5 +55,14 @@ public class UsuarioService {
         }
 
         return Optional.empty(); // E-mail não existe ou senha incorreta
+    }
+
+    public Usuario atualizarAuthority(Long id, String authority) {
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        usuario.setAuthorities(authority);
+
+        return repository.save(usuario);
     }
 }
