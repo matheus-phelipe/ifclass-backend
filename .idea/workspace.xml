@@ -6,9 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="9b13bd71-17e7-4994-bcb0-b6f8d0fad216" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/controller/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/controller/UsuarioController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/repository/UsuarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/repository/UsuarioRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/service/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/service/UsuarioService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/model/Sala.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/model/Sala.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,8 +17,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Enum" />
+        <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -39,12 +39,12 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.ifclass.executor": "Debug",
+    "Application.ifclass.executor": "Run",
     "Maven.ifclass [clean].executor": "Run",
     "Maven.ifclass [install].executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "BR-GERENCIARUSUARIOS",
+    "git-widget-placeholder": "master",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/mathe/OneDrive/Área de Trabalho/trabalhopps/ifclass-backend",
     "settings.editor.selected.configurable": "reference.projectsettings.compiler.annotationProcessors"

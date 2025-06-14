@@ -10,6 +10,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Entity
 public class Sala {
 
@@ -19,4 +20,6 @@ public class Sala {
 
     private Integer capacidade;
     private String  codigo;
+
+
 }
