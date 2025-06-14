@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -49,9 +50,24 @@ public class UsuarioController {
         return ResponseEntity.ok().body(Map.of("token", token));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioAtualizado) {
+        try {
+            Usuario atualizado = service.atualizarUsuario(id, usuarioAtualizado);
+            return ResponseEntity.ok(atualizado);
+        } catch (ResponseStatusException ex) {
+            return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
+        }
+    }
+
     @DeleteMapping("/{id}")
-    public void excluir(@PathVariable Long id) {
-        service.excluir(id);
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        try {
+            service.excluir(id);
+            return ResponseEntity.noContent().build();
+        } catch (ResponseStatusException ex) {
+            return ResponseEntity.status(ex.getStatusCode()).build();
+        }
     }
 
     @PatchMapping("/{id}/authority")
@@ -59,8 +75,12 @@ public class UsuarioController {
             @PathVariable Long id,
             @RequestBody Map<String, String> request
     ) {
-        String novaAuthority = request.get("authorities");
-        Usuario atualizado = service.atualizarAuthority(id, novaAuthority);
-        return ResponseEntity.ok(atualizado);
+        try {
+            String novaAuthority = request.get("authorities");
+            Usuario atualizado = service.atualizarAuthority(id, novaAuthority);
+            return ResponseEntity.ok(atualizado);
+        } catch (ResponseStatusException ex) {
+            return ResponseEntity.status(ex.getStatusCode()).body(null);
+        }
     }
 }
