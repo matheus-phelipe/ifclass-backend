@@ -1,9 +1,7 @@
 package com.ifclass.ifclass.sala.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -18,8 +16,18 @@ public class Sala {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Integer posX;       // Posição X (coordenada horizontal)
+    private Integer posY;       // Posição Y (coordenada vertical)
+    private Integer largura;    // Largura da sala
+    private Integer altura;
+
     private Integer capacidade;
     private String  codigo;
 
+    // Cria a relação de volta para o Bloco. Uma Sala pertence a um Bloco.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idbloco", nullable = false) // Define a coluna de chave estrangeira
+    @JsonBackReference // Evita loops infinitos ao converter para JSON
+    private Bloco bloco;
 
 }

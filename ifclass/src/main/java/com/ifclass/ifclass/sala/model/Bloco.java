@@ -1,5 +1,6 @@
 package com.ifclass.ifclass.sala.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,10 +24,27 @@ public class Bloco {
     @Column(nullable = false)
     private String nome;
 
-    // Um bloco agora tem uma coleção de entidades Sala.
-    // Cascade.ALL: Salvar/deletar um Bloco afeta suas Salas.
-    // orphanRemoval=true: Remover uma Sala da lista a deleta do banco.
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JoinColumn(name = "idbloco") // Isso cria a coluna 'bloco_id' na tabela 'sala'.
+    @OneToMany(mappedBy = "bloco", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JsonManagedReference
     private List<Sala> salas = new ArrayList<>();
+
+    /**
+     * Adiciona uma sala a este bloco, garantindo a consistência
+     * do relacionamento bidirecional.
+     * @param sala A sala a ser adicionada.
+     */
+    public void addSala(Sala sala) {
+        this.salas.add(sala);
+        sala.setBloco(this);
+    }
+
+    /**
+     * Remove uma sala deste bloco, garantindo a consistência
+     * do relacionamento bidirecional.
+     * @param sala A sala a ser removida.
+     */
+    public void removeSala(Sala sala) {
+        this.salas.remove(sala);
+        sala.setBloco(null);
+    }
 }

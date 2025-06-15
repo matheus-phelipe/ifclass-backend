@@ -41,6 +41,21 @@ public class BlocoController {
         }
     }
 
+    @PutMapping("/{blocoId}/salas/{salaId}")
+    public ResponseEntity<Sala> updateSala(
+            @PathVariable Long blocoId,
+            @PathVariable Long salaId,
+            @RequestBody Sala salaDetails) {
+        try {
+            Sala salaAtualizada = blocoService.updateSala(blocoId, salaId, salaDetails);
+            return ResponseEntity.ok(salaAtualizada);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @DeleteMapping("/{blocoId}")
     public ResponseEntity<Void> deleteBloco(@PathVariable Long blocoId) {
         try {
