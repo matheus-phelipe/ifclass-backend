@@ -2,7 +2,10 @@ package com.ifclass.ifclass.curso.controller;
 
 import com.ifclass.ifclass.curso.model.Curso;
 import com.ifclass.ifclass.curso.service.CursoService;
+import com.ifclass.ifclass.sala.model.Bloco;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +23,9 @@ public class CursoController {
     }
 
     @PostMapping
-    public Curso salvar(@RequestBody Curso curso) {
-        return service.salvar(curso);
+    public ResponseEntity<Curso> criarCurso(@RequestBody Curso curso) {
+        Curso novoCurso = service.criarCurso(curso);
+        return new ResponseEntity<>(novoCurso, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
