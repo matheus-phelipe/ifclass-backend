@@ -7,10 +7,12 @@ O **IFClass Backend** é a camada de serviços e lógica de negócio do sistema 
 
 ### 🔑 Principais Módulos
 
-- **API de Autenticação e Autorização:** Gerencia o login de usuários, a criação de tokens (JWT) e a verificação de perfis de acesso (`ROLE_ADMIN`, `ROLE_USER`).
+- **API de Autenticação e Autorização:** Gerencia o login de usuários, a criação de tokens (JWT) e a verificação de perfis de acesso (`ROLE_ADMIN`, `ROLE_ALUNO`, `ROLE_PROFESSOR`, `ROLE_COORDENADOR`).
 - **Gerenciamento de Blocos:** Endpoints CRUD para administração dos blocos do campus.
 - **Gerenciamento de Salas:** Endpoints CRUD para salas associadas aos blocos, com campos para posição (X, Y), largura e altura para a planta baixa interativa.
-- **Persistência de Dados:** Integração com MySQL via Spring Data JPA para armazenamento de dados seguro e eficiente.
+- **Gerenciamento de Usuários:** Endpoints CRUD para usuário, com campos nome, email, senha e authorities.
+- **Gerenciamento de Permissões:** Endpoints CRUD para permissões dos usuários.
+- **Persistência de Dados:** Integração com PostgreSQL via Spring Data JPA para armazenamento de dados seguro e eficiente.
 
 ## 🛠️ Tecnologias Utilizadas
 
