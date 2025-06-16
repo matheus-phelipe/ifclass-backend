@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.ifclass</groupId>
 	<artifactId>ifclass</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>ifclass</name>
 	<description>Backend projeto ifclass pps</description>
 	<url/>
@@ -77,11 +77,6 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.11.5</version>
 			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
