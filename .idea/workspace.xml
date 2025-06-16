@@ -5,11 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b13bd71-17e7-4994-bcb0-b6f8d0fad216" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/exception/ErrorResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/exception/ResourceConflictException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/exception/ResourceNotFoundException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/service/EmailService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/model/resetarSenha/PasswordResetToken.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/repository/resetarSenha/PasswordResetTokenRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/service/PasswordResetService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/util/security/SecurityConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/controller/BlocoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/controller/BlocoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/model/Bloco.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/model/Bloco.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/model/Sala.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/model/Sala.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/service/BlocoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/service/BlocoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/controller/CursoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/controller/CursoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/model/Curso.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/model/Curso.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/repository/CursoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/repository/CursoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/service/CursoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/service/CursoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/controller/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/controller/UsuarioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/util/JwtFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/util/JwtFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,18 +54,23 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.ifclass.executor": "Debug",
+    "Application.ifclass.executor": "Run",
     "Maven.ifclass [clean].executor": "Run",
     "Maven.ifclass [install].executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "Merging producao",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/mathe/OneDrive/Área de Trabalho/trabalhopps/ifclass-backend",
     "settings.editor.selected.configurable": "reference.projectsettings.compiler.annotationProcessors"
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RecentsManager">
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.ifclass.ifclass.common.service" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Maven.ifclass [clean,package,-DskipTests]">
     <configuration name="ifclass" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="ms-17" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
@@ -62,6 +80,42 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="ifclass [clean,package,-DskipTests]" type="MavenRunConfiguration" factoryName="Maven" nameIsGenerated="true">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="cmdOptions" />
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="clean" />
+                <option value="package" />
+                <option value="-DskipTests" />
+              </list>
+            </option>
+            <option name="multimoduleDir" />
+            <option name="pomFileName" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="projectsCmdOptionValues">
+              <list />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$/ifclass" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Application.ifclass" />
+      <item itemvalue="Maven.ifclass [clean,package,-DskipTests]" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -102,6 +156,11 @@
           <url>file://$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/service/CursoService.java</url>
           <line>19</line>
           <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/util/security/SecurityConfig.java</url>
+          <line>2</line>
+          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
