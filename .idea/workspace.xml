@@ -6,10 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="9b13bd71-17e7-4994-bcb0-b6f8d0fad216" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/controller/BlocoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/controller/BlocoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/model/Bloco.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/model/Bloco.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/model/Sala.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/model/Sala.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/service/BlocoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/sala/service/BlocoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/controller/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/controller/UsuarioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/util/JwtFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/util/JwtFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,19 +39,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.ifclass.executor": "Debug",
-    "Maven.ifclass [clean].executor": "Run",
-    "Maven.ifclass [install].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/mathe/OneDrive/Área de Trabalho/trabalhopps/ifclass-backend",
-    "settings.editor.selected.configurable": "reference.projectsettings.compiler.annotationProcessors"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.ifclass.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.ifclass [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.ifclass [install].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/mathe/OneDrive/Área de Trabalho/trabalhopps/ifclass-backend&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.projectsettings.compiler.annotationProcessors&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.ifclass.ifclass.common.service" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="ifclass" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="ms-17" />
@@ -102,6 +107,11 @@
           <url>file://$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/service/CursoService.java</url>
           <line>19</line>
           <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/util/security/SecurityConfig.java</url>
+          <line>2</line>
+          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
