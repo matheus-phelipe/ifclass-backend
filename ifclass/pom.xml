@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.ifclass</groupId>
 	<artifactId>ifclass</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>ifclass</name>
 	<description>Backend projeto ifclass pps</description>
 	<url/>
@@ -79,13 +79,10 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-<<<<<<< HEAD
-=======
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 		<dependency>
->>>>>>> 59cac207b16f9fb79857276edc540cab6ba9b6b4
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-crypto</artifactId>
 		</dependency>
