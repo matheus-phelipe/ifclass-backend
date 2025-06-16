@@ -41,7 +41,9 @@ public class JwtFilter extends OncePerRequestFilter {
             // Libera login ou cadastro, bloqueia o resto
             if (!request.getRequestURI().contains("/auth") &&
                     !request.getRequestURI().equals("/api/usuarios") &&
-                    !request.getRequestURI().contains("/usuarios/login")) {
+                    !request.getRequestURI().contains("/usuarios/login") &&
+                    !request.getRequestURI().contains("/usuarios/request-password-reset") &&
+                    !request.getRequestURI().contains("/usuarios/reset-password") ) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }

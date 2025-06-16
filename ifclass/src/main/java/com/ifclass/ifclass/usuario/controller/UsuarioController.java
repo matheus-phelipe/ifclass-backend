@@ -2,6 +2,7 @@ package com.ifclass.ifclass.usuario.controller;
 
 import com.ifclass.ifclass.usuario.model.Usuario;
 import com.ifclass.ifclass.usuario.model.dto.LoginDTO;
+import com.ifclass.ifclass.usuario.service.PasswordResetService;
 import com.ifclass.ifclass.usuario.service.UsuarioService;
 import com.ifclass.ifclass.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService service;
+
+    @Autowired
+    private PasswordResetService passwordResetService;
 
     @GetMapping
     public List<Usuario> listar() {
@@ -82,5 +86,25 @@ public class UsuarioController {
         } catch (ResponseStatusException ex) {
             return ResponseEntity.status(ex.getStatusCode()).body(null);
         }
+    }
+
+    // Endpoint para solicitar o link de redefinição
+    @PostMapping("/request-password-reset")
+    public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        passwordResetService.createPasswordResetTokenForUser(email);
+        // Sempre retorne OK, mesmo se o email não existir, por segurança.
+        return ResponseEntity.ok().build();
+    }
+
+    // Endpoint para redefinir a senha
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("newPassword");
+
+        // O serviço lançará exceções se o token for inválido/expirado
+        passwordResetService.resetPassword(token, newPassword);
+        return ResponseEntity.ok().build();
     }
 }
