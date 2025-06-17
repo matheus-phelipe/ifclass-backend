@@ -73,6 +73,7 @@ public class BlocoService {
         salaExistente.setPosY(salaDetails.getPosY());
         salaExistente.setLargura(salaDetails.getLargura());
         salaExistente.setAltura(salaDetails.getAltura());
+        salaExistente.setCor(salaDetails.getCor());
 
         // Salva e retorna a sala atualizada
         return salaRepository.save(salaExistente);
