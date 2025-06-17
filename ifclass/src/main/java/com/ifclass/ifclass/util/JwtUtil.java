@@ -11,10 +11,10 @@ import java.util.List;
 public class JwtUtil {
     private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    public static String generateToken(String email, String permissao) {
+    public static String generateToken(String email, List<String> permissao) {
         return Jwts.builder()
                 .setSubject(email)
-                .claim("authorities", List.of(permissao))
+                .claim("authorities", permissao)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 dia
                 .signWith(key)
