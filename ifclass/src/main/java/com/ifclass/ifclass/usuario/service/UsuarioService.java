@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +33,7 @@ public class UsuarioService {
         var encoder = new BCryptPasswordEncoder();
         usuario.setSenha(encoder.encode(usuario.getSenha()));
 
-        usuario.setAuthorities(String.valueOf(RoleUsuario.ROLE_ALUNO));
+        usuario.setAuthorities(Collections.singletonList(RoleUsuario.ROLE_ALUNO.toString()));
 
         repository.save(usuario);
         usuario.setSenha(null);
@@ -61,11 +62,11 @@ public class UsuarioService {
         return Optional.empty(); // E-mail não existe ou senha incorreta
     }
 
-    public Usuario atualizarAuthority(Long id, String authority) {
+    public Usuario atualizarAuthorities(Long id,  List<String> authorities) {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        usuario.setAuthorities(authority);
+        usuario.setAuthorities(authorities);
 
         return repository.save(usuario);
     }

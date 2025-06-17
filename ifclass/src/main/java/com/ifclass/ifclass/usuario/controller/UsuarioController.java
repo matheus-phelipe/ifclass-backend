@@ -74,14 +74,14 @@ public class UsuarioController {
         }
     }
 
-    @PatchMapping("/{id}/authority")
-    public ResponseEntity<Usuario> atualizarAuthority(
+    @PatchMapping("/{id}/authorities")
+    public ResponseEntity<Usuario> atualizarAuthorities(
             @PathVariable Long id,
-            @RequestBody Map<String, String> request
+            @RequestBody Map<String, List<String>> request
     ) {
         try {
-            String novaAuthority = request.get("authorities");
-            Usuario atualizado = service.atualizarAuthority(id, novaAuthority);
+            List<String> novasAuthorities = request.get("authorities");
+            Usuario atualizado = service.atualizarAuthorities(id, novasAuthorities);
             return ResponseEntity.ok(atualizado);
         } catch (ResponseStatusException ex) {
             return ResponseEntity.status(ex.getStatusCode()).body(null);

@@ -1,10 +1,9 @@
 package com.ifclass.ifclass.usuario.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,5 +20,8 @@ public class Usuario {
     private String email;
     private String senha;
     private String prontuario;
-    private String authorities;
-}
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "usuario_authorities", joinColumns = @JoinColumn(name = "usuario_id"))
+    @Column(name = "authority")
+    private List<String> authorities;}

@@ -23,6 +23,7 @@ public class Sala {
 
     private Integer capacidade;
     private String  codigo;
+    private String cor;
 
     // Cria a relação de volta para o Bloco. Uma Sala pertence a um Bloco.
     @ManyToOne(fetch = FetchType.LAZY)
