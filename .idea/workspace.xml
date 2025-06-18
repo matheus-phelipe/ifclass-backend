@@ -42,6 +42,7 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+<<<<<<< Updated upstream
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.ifclass.executor": "Run",
@@ -53,8 +54,21 @@
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/mathe/OneDrive/Área de Trabalho/trabalhopps/ifclass-backend",
     "settings.editor.selected.configurable": "reference.projectsettings.compiler.annotationProcessors"
+=======
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.ifclass.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.ifclass [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.ifclass [install].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Merging producao&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/mathe/OneDrive/Área de Trabalho/trabalhopps/ifclass-backend&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.projectsettings.compiler.annotationProcessors&quot;
+>>>>>>> Stashed changes
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.ifclass.ifclass.common.service" />
