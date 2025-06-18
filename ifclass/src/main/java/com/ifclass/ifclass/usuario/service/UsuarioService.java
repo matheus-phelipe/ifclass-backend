@@ -6,6 +6,8 @@ import com.ifclass.ifclass.usuario.model.dto.RoleUsuario;
 import com.ifclass.ifclass.usuario.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,10 +23,12 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository repository;
 
+    @Cacheable(value = "usuarios", key = "'all'")
     public List<Usuario> listar() {
         return repository.findAll();
     }
 
+    @CacheEvict(value = "usuarios", allEntries = true)
     public Usuario cadastrar(Usuario usuario) {
         if (repository.findByEmail(usuario.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email já cadastrado");
@@ -41,12 +45,14 @@ public class UsuarioService {
         return usuario;
     }
 
+    @CacheEvict(value = "usuarios", allEntries = true)
     public void excluir(Long id) {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
         repository.delete(usuario);
     }
 
+    @Cacheable(value = "usuarios", key = "#login.email")
     public Optional<Usuario> logar(LoginDTO login) {
         Optional<Usuario> usuarioOpt = repository.findByEmail(login.getEmail());
 
@@ -62,6 +68,7 @@ public class UsuarioService {
         return Optional.empty(); // E-mail não existe ou senha incorreta
     }
 
+    @CacheEvict(value = "usuarios", allEntries = true)
     public Usuario atualizarAuthorities(Long id,  List<String> authorities) {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
@@ -71,6 +78,7 @@ public class UsuarioService {
         return repository.save(usuario);
     }
 
+    @CacheEvict(value = "usuarios", allEntries = true)
     public Usuario atualizarUsuario(Long id, Usuario usuarioAtualizado) {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
