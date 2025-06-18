@@ -4,6 +4,8 @@ import com.ifclass.ifclass.turma.model.Turma;
 import com.ifclass.ifclass.turma.repository.TurmaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -21,7 +23,17 @@ public class TurmaService {
         return repository.save(turma);
     }
 
+    public Turma atualizar(Turma turma) {
+        if (!repository.existsById(turma.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada");
+        }
+        return repository.save(turma);
+    }
+
     public void excluir(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Turma não encontrada");
+        }
         repository.deleteById(id);
     }
 }

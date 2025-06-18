@@ -5,24 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b13bd71-17e7-4994-bcb0-b6f8d0fad216" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/exception/ErrorResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/exception/ResourceConflictException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/exception/ResourceNotFoundException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/service/EmailService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/model/resetarSenha/PasswordResetToken.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/repository/resetarSenha/PasswordResetTokenRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/service/PasswordResetService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/util/security/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/controller/CursoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/controller/CursoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/model/Curso.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/model/Curso.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/repository/CursoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/repository/CursoRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/service/CursoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/service/CursoService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/controller/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/usuario/controller/UsuarioController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/util/JwtFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/util/JwtFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ifclass/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ifclass/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/backend/config/CacheConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/exception/ApiError.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/exception/ApiSubError.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/common/exception/ApiValidationError.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/turma/model/TurmaDTO.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +29,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/ifclass" />
   </component>
   <component name="JpbToolWindowState">
     <option name="isToolWindowVisible" value="false" />
@@ -59,7 +49,7 @@
     "Maven.ifclass [install].executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "Merging producao",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/mathe/OneDrive/Área de Trabalho/trabalhopps/ifclass-backend",
     "settings.editor.selected.configurable": "reference.projectsettings.compiler.annotationProcessors"
@@ -154,13 +144,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/curso/service/CursoService.java</url>
-          <line>19</line>
+          <line>22</line>
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ifclass/src/main/java/com/ifclass/ifclass/util/security/SecurityConfig.java</url>
-          <line>2</line>
-          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

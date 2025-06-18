@@ -6,6 +6,8 @@ import com.ifclass.ifclass.sala.repository.BlocoRepository;
 import com.ifclass.ifclass.sala.repository.SalaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +23,13 @@ public class BlocoService {
     private SalaRepository salaRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "blocos", key = "'all'")
     public List<Bloco> findAll() {
         return blocoRepository.findAll();
     }
 
     @Transactional
+    @CacheEvict(value = "blocos", allEntries = true)
     public Bloco createBloco(Bloco bloco) {
         if (bloco.getSalas() == null) {
             bloco.setSalas(new java.util.ArrayList<>());
@@ -34,6 +38,7 @@ public class BlocoService {
     }
 
     @Transactional
+    @CacheEvict(value = "blocos", allEntries = true)
     public Bloco addSalaToBloco(Long blocoId, Sala sala) {
         // 1. Encontra o bloco "pai"
         Bloco bloco = blocoRepository.findById(blocoId)
@@ -51,6 +56,7 @@ public class BlocoService {
     }
 
     @Transactional
+    @CacheEvict(value = "blocos", allEntries = true)
     public Sala updateSala(Long blocoId, Long salaId, Sala salaDetails) {
         // Verifica se o bloco existe
         if (!blocoRepository.existsById(blocoId)) {
@@ -80,6 +86,7 @@ public class BlocoService {
     }
 
     @Transactional
+    @CacheEvict(value = "blocos", allEntries = true)
     public void deleteBloco(Long blocoId) {
         if (!blocoRepository.existsById(blocoId)) {
             throw new EntityNotFoundException("Bloco não encontrado com id: " + blocoId);
@@ -88,6 +95,7 @@ public class BlocoService {
     }
 
     @Transactional
+    @CacheEvict(value = "blocos", allEntries = true)
     public Bloco deleteSalaFromBloco(Long blocoId, Long salaId) {
         Bloco bloco = blocoRepository.findById(blocoId)
                 .orElseThrow(() -> new EntityNotFoundException("Bloco não encontrado com id: " + blocoId));

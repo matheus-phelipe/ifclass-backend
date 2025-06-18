@@ -20,6 +20,6 @@ public class Turma {
     @ManyToOne
     @JoinColumn(name = "idcurso")
     private Curso curso;
-    private Date ano;
+    private Integer ano;
     private Long semestre;
 }
