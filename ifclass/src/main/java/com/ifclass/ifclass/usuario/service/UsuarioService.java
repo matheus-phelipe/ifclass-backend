@@ -24,8 +24,13 @@ public class UsuarioService {
     private UsuarioRepository repository;
 
     @Cacheable(value = "usuarios", key = "'all'")
-    public List<Usuario> listar() {
-        return repository.findAll();
+    public List<Usuario> listarSemAdmin() {
+        return repository.findByUsuarioExceptAdmin();
+    }
+
+    @Cacheable(value = "usuarios", key = "'all'")
+    public List<Usuario> listarSemCoordenadorSemAdmin() {
+        return repository.findByUsuarioExceptAdminCoor();
     }
 
     @CacheEvict(value = "usuarios", allEntries = true)

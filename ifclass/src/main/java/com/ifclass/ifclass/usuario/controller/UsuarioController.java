@@ -26,9 +26,16 @@ public class UsuarioController {
     @Autowired
     private PasswordResetService passwordResetService;
 
-    @GetMapping
-    public List<Usuario> listar() {
-        return service.listar();
+
+
+    @GetMapping("/lista/admin")
+    public List<Usuario> listarSemAdmin() {
+        return service.listarSemAdmin();
+    }
+
+    @GetMapping("/lista/coordenador")
+    public List<Usuario> listarSemCoordenadorSemAdmin() {
+        return service.listarSemCoordenadorSemAdmin();
     }
 
     @PostMapping
