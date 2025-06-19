@@ -1,6 +1,9 @@
 package com.ifclass.ifclass.alunoTurma.controller;
 
 import com.ifclass.ifclass.alunoTurma.service.AlunoTurmaService;
+import com.ifclass.ifclass.alunoTurma.repository.AlunoTurmaRepository;
+import com.ifclass.ifclass.turma.model.Turma;
+import com.ifclass.ifclass.usuario.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 public class AlunoTurmaController {
     @Autowired
     private AlunoTurmaService alunoTurmaService;
+
+    @Autowired
+    private AlunoTurmaRepository alunoTurmaRepository;
 
     @PostMapping("/{alunoId}/{turmaId}")
     public ResponseEntity<?> vincularAlunoTurma(@PathVariable Long alunoId, @PathVariable Long turmaId) {
@@ -38,5 +44,13 @@ public class AlunoTurmaController {
     public ResponseEntity<?> desvincularAlunoDaTurma(@PathVariable Long alunoId) {
         alunoTurmaService.desvincularAlunoDaTurma(alunoId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/aluno/{alunoId}")
+    public ResponseEntity<Turma> buscarTurmaDoAluno(@PathVariable Long alunoId) {
+        Usuario usuario = new Usuario();
+        usuario.setId(alunoId);
+        var vinculo = alunoTurmaRepository.findByAluno(usuario).stream().findFirst().orElse(null);
+        return vinculo != null ? ResponseEntity.ok(vinculo.getTurma()) : ResponseEntity.notFound().build();
     }
 } 
