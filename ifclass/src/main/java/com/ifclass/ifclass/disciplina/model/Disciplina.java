@@ -18,10 +18,12 @@ public class Disciplina {
     private Long id;
 
     private String nome;
-
+    private String codigo;
+    private String departamento;
+    private String descricao;
 
     @ManyToOne
     @JoinColumn(name = "idcurso")
     private Curso curso;
-    private Integer cargaHorario;
+    private Integer cargaHoraria;
 }
