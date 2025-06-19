@@ -4,6 +4,8 @@ import com.ifclass.ifclass.usuario.model.Usuario;
 import com.ifclass.ifclass.usuario.model.dto.LoginDTO;
 import com.ifclass.ifclass.usuario.model.dto.RoleUsuario;
 import com.ifclass.ifclass.usuario.repository.UsuarioRepository;
+import com.ifclass.ifclass.disciplina.model.Disciplina;
+import com.ifclass.ifclass.disciplina.repository.DisciplinaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -16,12 +18,16 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UsuarioService {
 
     @Autowired
     private UsuarioRepository repository;
+
+    @Autowired
+    private DisciplinaRepository disciplinaRepository;
 
     @Cacheable(value = "usuarios", key = "'all'")
     public List<Usuario> listar() {
@@ -102,5 +108,29 @@ public class UsuarioService {
         usuario.setProntuario(usuarioAtualizado.getProntuario());
 
         return repository.save(usuario);
+    }
+
+    public void vincularDisciplina(Long professorId, Long disciplinaId) {
+        Usuario professor = repository.findById(professorId)
+            .orElseThrow(() -> new EntityNotFoundException("Professor não encontrado"));
+        Disciplina disciplina = disciplinaRepository.findById(disciplinaId)
+            .orElseThrow(() -> new EntityNotFoundException("Disciplina não encontrada"));
+        professor.getDisciplinas().add(disciplina);
+        repository.save(professor);
+    }
+
+    public void desvincularDisciplina(Long professorId, Long disciplinaId) {
+        Usuario professor = repository.findById(professorId)
+            .orElseThrow(() -> new EntityNotFoundException("Professor não encontrado"));
+        Disciplina disciplina = disciplinaRepository.findById(disciplinaId)
+            .orElseThrow(() -> new EntityNotFoundException("Disciplina não encontrada"));
+        professor.getDisciplinas().remove(disciplina);
+        repository.save(professor);
+    }
+
+    public Set<Disciplina> listarDisciplinas(Long professorId) {
+        Usuario professor = repository.findById(professorId)
+            .orElseThrow(() -> new EntityNotFoundException("Professor não encontrado"));
+        return professor.getDisciplinas();
     }
 }

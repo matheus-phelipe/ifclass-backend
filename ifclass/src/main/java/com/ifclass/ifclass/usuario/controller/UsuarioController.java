@@ -5,6 +5,7 @@ import com.ifclass.ifclass.usuario.model.dto.LoginDTO;
 import com.ifclass.ifclass.usuario.service.PasswordResetService;
 import com.ifclass.ifclass.usuario.service.UsuarioService;
 import com.ifclass.ifclass.util.JwtUtil;
+import com.ifclass.ifclass.disciplina.model.Disciplina;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -106,5 +108,22 @@ public class UsuarioController {
         // O serviço lançará exceções se o token for inválido/expirado
         passwordResetService.resetPassword(token, newPassword);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{professorId}/disciplinas/{disciplinaId}")
+    public ResponseEntity<?> vincularDisciplina(@PathVariable Long professorId, @PathVariable Long disciplinaId) {
+        service.vincularDisciplina(professorId, disciplinaId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{professorId}/disciplinas/{disciplinaId}")
+    public ResponseEntity<?> desvincularDisciplina(@PathVariable Long professorId, @PathVariable Long disciplinaId) {
+        service.desvincularDisciplina(professorId, disciplinaId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{professorId}/disciplinas")
+    public ResponseEntity<Set<Disciplina>> listarDisciplinas(@PathVariable Long professorId) {
+        return ResponseEntity.ok(service.listarDisciplinas(professorId));
     }
 }
