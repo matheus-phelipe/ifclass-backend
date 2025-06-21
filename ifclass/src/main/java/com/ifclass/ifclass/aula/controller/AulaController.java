@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/aulas")
@@ -29,11 +30,8 @@ public class AulaController {
 
     @PostMapping
     public ResponseEntity<Aula> criarAula(@RequestBody Aula aula) {
-        salaRepository.findById(aula.getSala().getId()).orElseThrow();
-        turmaRepository.findById(aula.getTurma().getId()).orElseThrow();
-        disciplinaRepository.findById(aula.getDisciplina().getId()).orElseThrow();
-        usuarioRepository.findById(aula.getProfessor().getId()).orElseThrow();
-        return ResponseEntity.ok(aulaService.salvar(aula));
+        Aula novaAula = aulaService.salvar(aula);
+        return ResponseEntity.ok(novaAula);
     }
 
     @GetMapping("/turma/{turmaId}/data/{data}")
@@ -54,5 +52,22 @@ public class AulaController {
     @GetMapping
     public List<Aula> listarTodas() {
         return aulaService.listarTodas();
+    }
+
+    @GetMapping("/professor/{professorId}/proxima")
+    public ResponseEntity<Aula> buscarProximaAula(@PathVariable Long professorId) {
+        return aulaService.buscarProximaAula(professorId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> removerAula(@PathVariable Long id) {
+        try {
+            aulaService.remover(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 } 

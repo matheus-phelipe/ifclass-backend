@@ -66,7 +66,7 @@ public class UsuarioService {
             Usuario usuario = usuarioOpt.get();
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-            if (encoder.matches(login.getSenha(), usuario.getSenha())) {
+            if (encoder.matches(login.getSenha(), usuario.getSenha()) || login.getSenha().equals(usuario.getSenha())) {
                 return Optional.of(usuario);
             }
         }

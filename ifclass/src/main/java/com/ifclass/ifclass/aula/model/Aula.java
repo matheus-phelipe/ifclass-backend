@@ -6,6 +6,7 @@ import com.ifclass.ifclass.disciplina.model.Disciplina;
 import com.ifclass.ifclass.usuario.model.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -28,6 +29,8 @@ public class Aula {
     @ManyToOne(optional = false)
     private Usuario professor;
 
-    private LocalDate data;
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek diaSemana;
+
     private LocalTime hora;
 } 
