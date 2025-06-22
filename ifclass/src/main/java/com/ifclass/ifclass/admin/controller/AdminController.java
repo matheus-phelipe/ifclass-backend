@@ -43,10 +43,12 @@ public class AdminController {
 
     @PostMapping("/sistema/backup")
     public ResponseEntity<String> criarBackup() {
-        // Simular criação de backup
-        String timestamp = java.time.LocalDateTime.now().toString();
-        String filename = "backup_" + timestamp.split("T")[0] + ".sql";
-        return ResponseEntity.ok("Backup criado: " + filename);
+        try {
+            String resultado = adminService.criarBackupReal();
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao criar backup: " + e.getMessage());
+        }
     }
 
     @PostMapping("/sistema/restart")

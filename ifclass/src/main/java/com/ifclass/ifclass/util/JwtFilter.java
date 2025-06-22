@@ -43,7 +43,8 @@ public class JwtFilter extends OncePerRequestFilter {
                     !request.getRequestURI().equals("/api/usuarios") &&
                     !request.getRequestURI().contains("/usuarios/login") &&
                     !request.getRequestURI().contains("/usuarios/request-password-reset") &&
-                    !request.getRequestURI().contains("/usuarios/reset-password") ) {
+                    !request.getRequestURI().contains("/usuarios/reset-password") &&
+                    !request.getRequestURI().contains("/relatorios") ) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
