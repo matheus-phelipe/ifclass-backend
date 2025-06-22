@@ -31,7 +31,7 @@ public class UsuarioService {
 
     @Cacheable(value = "usuarios", key = "'all'")
     public List<Usuario> listar() {
-        return repository.findAll();
+        return repository.findAllByAuthoritiesNotContaining("ROLE_ADMIN");
     }
 
     @CacheEvict(value = "usuarios", allEntries = true)
