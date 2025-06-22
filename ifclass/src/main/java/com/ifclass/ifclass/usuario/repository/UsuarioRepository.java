@@ -12,5 +12,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByProntuario(String prontuario);
 
     List<Usuario> findAllByAuthoritiesNotContaining(String authority);
+
+    // Métodos para coordenação
+    Long countByAuthoritiesContaining(String authority);
+    List<Usuario> findByAuthoritiesContaining(String authority);
 }
 
