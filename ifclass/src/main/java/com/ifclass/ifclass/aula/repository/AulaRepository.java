@@ -15,4 +15,6 @@ public interface AulaRepository extends JpaRepository<Aula, Long> {
     List<Aula> findByProfessorIdAndDiaSemana(Long professorId, DayOfWeek diaSemana);
 
     List<Aula> findByProfessorId(Long professorId);
-} 
+
+    List<Aula> findByDiaSemana(DayOfWeek diaSemana);
+}

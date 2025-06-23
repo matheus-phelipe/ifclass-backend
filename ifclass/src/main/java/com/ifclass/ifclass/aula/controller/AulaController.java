@@ -61,6 +61,11 @@ public class AulaController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/hoje")
+    public List<Aula> buscarAulasDeHoje() {
+        return aulaService.buscarAulasDeHoje();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removerAula(@PathVariable Long id) {
         try {

@@ -76,4 +76,12 @@ public class AulaService {
 
         return Optional.empty(); // Nenhuma aula futura encontrada
     }
-} 
+
+    public List<Aula> buscarAulasDeHoje() {
+        DayOfWeek hoje = LocalDate.now().getDayOfWeek();
+        return repository.findByDiaSemana(hoje)
+                .stream()
+                .sorted(Comparator.comparing(Aula::getHora))
+                .collect(java.util.stream.Collectors.toList());
+    }
+}
