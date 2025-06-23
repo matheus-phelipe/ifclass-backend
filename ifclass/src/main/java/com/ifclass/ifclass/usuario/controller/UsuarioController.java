@@ -2,6 +2,7 @@ package com.ifclass.ifclass.usuario.controller;
 
 import com.ifclass.ifclass.usuario.model.Usuario;
 import com.ifclass.ifclass.usuario.model.dto.LoginDTO;
+import com.ifclass.ifclass.usuario.model.dto.UsuarioDetalhesDTO;
 import com.ifclass.ifclass.usuario.service.PasswordResetService;
 import com.ifclass.ifclass.usuario.service.UsuarioService;
 import com.ifclass.ifclass.util.JwtUtil;
@@ -31,6 +32,11 @@ public class UsuarioController {
     @GetMapping
     public List<Usuario> listar() {
         return service.listar();
+    }
+
+    @GetMapping("/detalhes")
+    public List<UsuarioDetalhesDTO> listarComDetalhes() {
+        return service.listarComDetalhes();
     }
 
     @PostMapping
