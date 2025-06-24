@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -28,6 +29,12 @@ public class AdminController {
     public ResponseEntity<MonitoramentoSistemaDTO> getMonitoramentoSistema() {
         MonitoramentoSistemaDTO monitoramento = adminService.getMonitoramentoSistema();
         return ResponseEntity.ok(monitoramento);
+    }
+
+    @GetMapping("/performance")
+    public ResponseEntity<Map<String, Object>> getPerformanceMetrics() {
+        Map<String, Object> metrics = adminService.getPerformanceMetrics();
+        return ResponseEntity.ok(metrics);
     }
 
     @GetMapping("/sistema/logs")
