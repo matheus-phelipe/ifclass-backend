@@ -212,6 +212,10 @@ public class RelatorioService {
                 return gerarRelatorioDesempenhoTurmas(request);
             case "grade-horaria":
                 return gerarRelatorioGradeHoraria(request);
+            case "analytics-dashboard":
+                return gerarRelatorioAnalyticsDashboard(request);
+            case "analytics-export":
+                return gerarRelatorioAnalyticsExport(request);
             default:
                 return "Tipo de relatório não reconhecido: " + request.getTipo();
         }
@@ -370,12 +374,129 @@ public class RelatorioService {
                "</html>";
     }
 
+    private String gerarRelatorioAnalyticsDashboard(RelatorioRequestDTO request) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("RELATÓRIO ANALYTICS DASHBOARD\n");
+        sb.append("============================\n\n");
+
+        // Estatísticas gerais
+        long totalUsuarios = usuarioRepository.count();
+        long totalProfessores = usuarioRepository.countByAuthoritiesContaining("ROLE_PROFESSOR");
+        long totalAulas = aulaRepository.count();
+        long totalSalas = salaRepository.count();
+
+        sb.append("📊 RESUMO EXECUTIVO\n");
+        sb.append("-------------------\n");
+        sb.append("Total de Usuários: ").append(totalUsuarios).append("\n");
+        sb.append("Total de Professores: ").append(totalProfessores).append("\n");
+        sb.append("Total de Aulas: ").append(totalAulas).append("\n");
+        sb.append("Total de Salas: ").append(totalSalas).append("\n\n");
+
+        // Análise de utilização
+        sb.append("📈 ANÁLISE DE UTILIZAÇÃO\n");
+        sb.append("------------------------\n");
+
+        // Salas mais utilizadas
+        sb.append("Salas Mais Utilizadas:\n");
+        salaRepository.findAll().forEach(sala -> {
+            long aulasSala = aulaRepository.findAll().stream()
+                .filter(aula -> aula.getSala().getId().equals(sala.getId()))
+                .count();
+            if (aulasSala > 0) {
+                sb.append("- ").append(sala.getCodigo())
+                  .append(": ").append(aulasSala).append(" aulas\n");
+            }
+        });
+
+        sb.append("\n");
+
+        // Professores mais ativos
+        sb.append("Professores Mais Ativos:\n");
+        usuarioRepository.findAll().stream()
+            .filter(usuario -> usuario.getAuthorities().contains("ROLE_PROFESSOR"))
+            .forEach(professor -> {
+                long aulasProf = aulaRepository.findAll().stream()
+                    .filter(aula -> aula.getProfessor().getId().equals(professor.getId()))
+                    .count();
+                if (aulasProf > 0) {
+                    sb.append("- ").append(professor.getNome())
+                      .append(": ").append(aulasProf).append(" aulas\n");
+                }
+            });
+
+        sb.append("\n");
+
+        // Insights e recomendações
+        sb.append("💡 INSIGHTS E RECOMENDAÇÕES\n");
+        sb.append("---------------------------\n");
+
+        double utilizacaoSalas = totalSalas > 0 ? (double) totalAulas / totalSalas : 0;
+        sb.append("- Taxa de utilização média das salas: ").append(String.format("%.1f", utilizacaoSalas)).append(" aulas/sala\n");
+
+        if (totalProfessores > 0) {
+            double mediaAulasProf = (double) totalAulas / totalProfessores;
+            sb.append("- Média de aulas por professor: ").append(String.format("%.1f", mediaAulasProf)).append(" aulas\n");
+        }
+
+        sb.append("- Sistema operando com ").append(totalUsuarios).append(" usuários ativos\n");
+        sb.append("- Recomenda-se monitorar a distribuição de carga horária entre professores\n");
+
+        return sb.toString();
+    }
+
+    private String gerarRelatorioAnalyticsExport(RelatorioRequestDTO request) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("EXPORTAÇÃO ANALYTICS - DADOS DETALHADOS\n");
+        sb.append("======================================\n\n");
+
+        // Dados para exportação em formato estruturado
+        sb.append("DADOS ESTRUTURADOS PARA ANÁLISE\n");
+        sb.append("-------------------------------\n");
+
+        // Cabeçalhos CSV-like para facilitar importação
+        sb.append("AULAS_POR_PROFESSOR:\n");
+        sb.append("Professor,Total_Aulas,Status_Carga\n");
+
+        usuarioRepository.findAll().stream()
+            .filter(usuario -> usuario.getAuthorities().contains("ROLE_PROFESSOR"))
+            .forEach(professor -> {
+                long aulasProf = aulaRepository.findAll().stream()
+                    .filter(aula -> aula.getProfessor().getId().equals(professor.getId()))
+                    .count();
+
+                String status = aulasProf < 10 ? "BAIXA" : aulasProf > 20 ? "ALTA" : "NORMAL";
+
+                sb.append(professor.getNome().replace(",", ";"))
+                  .append(",").append(aulasProf)
+                  .append(",").append(status)
+                  .append("\n");
+            });
+
+        sb.append("\nUSO_SALAS:\n");
+        sb.append("Codigo,Total_Aulas,Bloco\n");
+
+        salaRepository.findAll().forEach(sala -> {
+            long aulasSala = aulaRepository.findAll().stream()
+                .filter(aula -> aula.getSala().getId().equals(sala.getId()))
+                .count();
+
+            sb.append(sala.getCodigo())
+              .append(",").append(aulasSala)
+              .append(",").append(sala.getBloco().getNome().replace(",", ";"))
+              .append("\n");
+        });
+
+        return sb.toString();
+    }
+
     private String getTituloRelatorio(String tipo) {
         switch (tipo) {
             case "ocupacao-salas": return "Relatório de Ocupação de Salas";
             case "carga-horaria": return "Relatório de Carga Horária dos Professores";
             case "desempenho-turmas": return "Relatório de Desempenho por Turma";
             case "grade-horaria": return "Relatório de Grade Horária Geral";
+            case "analytics-dashboard": return "Relatório Analytics Dashboard";
+            case "analytics-export": return "Exportação de Dados Analytics";
             default: return "Relatório";
         }
     }
