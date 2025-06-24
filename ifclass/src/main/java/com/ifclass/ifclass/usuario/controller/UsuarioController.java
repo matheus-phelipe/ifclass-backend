@@ -6,12 +6,16 @@ import com.ifclass.ifclass.usuario.model.dto.UsuarioDetalhesDTO;
 import com.ifclass.ifclass.usuario.service.PasswordResetService;
 import com.ifclass.ifclass.usuario.service.UsuarioService;
 import com.ifclass.ifclass.util.JwtUtil;
+import com.ifclass.ifclass.util.security.InputValidator;
+import com.ifclass.ifclass.util.security.SecurityLogger;
 import com.ifclass.ifclass.disciplina.model.Disciplina;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +31,16 @@ public class UsuarioController {
     private UsuarioService service;
 
     @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
     private PasswordResetService passwordResetService;
+
+    @Autowired
+    private InputValidator inputValidator;
+
+    @Autowired
+    private SecurityLogger securityLogger;
 
     @GetMapping
     public List<Usuario> listar() {
@@ -52,13 +65,36 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO auth) {
+    public ResponseEntity<?> login(@RequestBody LoginDTO auth, HttpServletRequest request) {
+        String clientIP = securityLogger.getClientIP(request);
+
+        // Validações de entrada
+        if (auth.getEmail() == null || auth.getSenha() == null) {
+            securityLogger.logLoginAttempt("null", clientIP, false);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email e senha são obrigatórios");
+        }
+
+        // Validar formato do email
+        if (!inputValidator.isValidEmail(auth.getEmail())) {
+            securityLogger.logLoginAttempt(auth.getEmail(), clientIP, false);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Formato de email inválido");
+        }
+
+        // Verificar tentativas de XSS ou SQL Injection
+        if (!inputValidator.isSafeInput(auth.getEmail()) || !inputValidator.isSafeInput(auth.getSenha())) {
+            securityLogger.logXSSAttempt(auth.getEmail(), clientIP, "/api/usuarios/login");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Entrada inválida detectada");
+        }
+
         Optional<Usuario> usuario = service.logar(auth);
         if (usuario.isEmpty()) {
+            securityLogger.logLoginAttempt(auth.getEmail(), clientIP, false);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
         }
 
-        String token = JwtUtil.generateToken(usuario.get().getId(), usuario.get().getEmail(), usuario.get().getAuthorities());
+        // Login bem-sucedido
+        securityLogger.logLoginAttempt(auth.getEmail(), clientIP, true);
+        String token = jwtUtil.generateToken(usuario.get().getId(), usuario.get().getEmail(), usuario.get().getAuthorities());
         return ResponseEntity.ok().body(Map.of("token", token));
     }
 
