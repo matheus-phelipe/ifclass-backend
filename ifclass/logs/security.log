@@ -1,8 +1,2 @@
-2025-06-24 03:47:19 WARN  - [2025-06-24 03:47:19] INVALID_TOKEN - IP: 192.168.18.6, Token: eyJhbGciOi...
-2025-06-24 03:47:19 WARN  - [2025-06-24 03:47:19] INVALID_TOKEN - IP: 192.168.18.6, Token: eyJhbGciOi...
-2025-06-24 03:47:28 INFO  - [2025-06-24 03:47:28] LOGIN_SUCCESS - Email: admin@gmail.com, IP: 192.168.18.6
-2025-06-24 03:47:58 INFO  - [2025-06-24 03:47:58] LOGIN_SUCCESS - Email: admin@gmail.com, IP: 192.168.18.6
-2025-06-24 03:49:52 WARN  - [2025-06-24 03:49:52] UNAUTHORIZED_ACCESS - URI: /api/usuarios/usuarios, IP: 0:0:0:0:0:0:0:1, UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
-2025-06-24 03:49:55 WARN  - [2025-06-24 03:49:55] UNAUTHORIZED_ACCESS - URI: /api/usuarios/usuario, IP: 0:0:0:0:0:0:0:1, UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
-2025-06-24 03:50:08 WARN  - [2025-06-24 03:50:08] UNAUTHORIZED_ACCESS - URI: /api/usuarios/salas, IP: 0:0:0:0:0:0:0:1, UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
-2025-06-24 03:50:12 WARN  - [2025-06-24 03:50:12] UNAUTHORIZED_ACCESS - URI: /api/usuarios/sala, IP: 0:0:0:0:0:0:0:1, UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+2025-06-25 00:14:51 INFO  - [2025-06-25 00:14:51] LOGIN_SUCCESS - Email: admin@gmail.com, IP: 192.168.18.6
+2025-06-25 00:18:18 INFO  - [2025-06-25 00:18:18] LOGIN_SUCCESS - Email: admin@gmail.com, IP: 192.168.18.41
