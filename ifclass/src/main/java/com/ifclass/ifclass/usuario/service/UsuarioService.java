@@ -41,6 +41,10 @@ public class UsuarioService {
         return repository.findAllByAuthoritiesNotContaining("ROLE_ADMIN");
     }
 
+    public List<Usuario> listarProfessores() {
+        return repository.findByAuthoritiesContaining("ROLE_PROFESSOR");
+    }
+
     @Cacheable(value = "usuarios", key = "'detalhes'")
     public List<UsuarioDetalhesDTO> listarComDetalhes() {
         List<Usuario> usuarios = repository.findAllByAuthoritiesNotContaining("ROLE_ADMIN");

@@ -47,6 +47,11 @@ public class UsuarioController {
         return service.listar();
     }
 
+    @GetMapping("/listar/professores")
+    public List<Usuario> listarProfessores() {
+        return service.listarProfessores();
+    }
+
     @GetMapping("/detalhes")
     public List<UsuarioDetalhesDTO> listarComDetalhes() {
         return service.listarComDetalhes();
