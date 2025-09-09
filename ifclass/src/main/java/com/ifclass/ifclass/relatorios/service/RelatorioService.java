@@ -3,6 +3,7 @@ package com.ifclass.ifclass.relatorios.service;
 import com.ifclass.ifclass.aula.repository.AulaRepository;
 import com.ifclass.ifclass.disciplina.repository.DisciplinaRepository;
 import com.ifclass.ifclass.relatorios.dto.RelatorioRequestDTO;
+import com.ifclass.ifclass.sala.model.Sala;
 import com.ifclass.ifclass.sala.repository.SalaRepository;
 import com.ifclass.ifclass.turma.repository.TurmaRepository;
 import com.ifclass.ifclass.usuario.repository.UsuarioRepository;
@@ -136,23 +137,17 @@ public class RelatorioService {
      * O arquivo DEVE ser salvo com a extensão .xlsx
      */
     public byte[] gerarRelatorioExcel(RelatorioRequestDTO requisicao) throws IOException {
-        // Usamos um try-with-resources para garantir que os recursos (planilha e fluxo) sejam fechados
         try (XSSFWorkbook pastaDeTrabalho = new XSSFWorkbook(); ByteArrayOutputStream fluxoDeSaidaBytes = new ByteArrayOutputStream()) {
-            // Cria uma nova aba na planilha com o título apropriado
             XSSFSheet aba = pastaDeTrabalho.createSheet(getTituloRelatorio(requisicao.getTipo()));
 
-            // Cria um estilo para o cabeçalho (negrito)
             CellStyle estiloCabecalho = pastaDeTrabalho.createCellStyle();
             Font fonte = pastaDeTrabalho.createFont();
             fonte.setBold(true);
             estiloCabecalho.setFont(fonte);
 
-            // Contador atômico para o número da linha atual, começando em 1
             AtomicInteger numeroLinha = new AtomicInteger(1);
-            // Cria a primeira linha (índice 0) para o cabeçalho
             Row linhaCabecalho = aba.createRow(0);
 
-            // Escolhe o tipo de relatório a ser gerado
             switch (requisicao.getTipo()) {
                 case "ocupacao-salas": {
                     String[] cabecalhos = {"Sala", "Capacidade", "Aulas", "Ocupação"};
@@ -162,12 +157,20 @@ public class RelatorioService {
                         celula.setCellStyle(estiloCabecalho);
                     }
                     salaRepository.findAll().forEach(sala -> {
+                        // --- LÓGICA DE CONTAGEM REVERTIDA ---
                         long aulasNaSala = aulaRepository.findAll().stream().filter(aula -> aula.getSala().getId().equals(sala.getId())).count();
+
                         Row linha = aba.createRow(numeroLinha.getAndIncrement());
                         linha.createCell(0).setCellValue(sala.getCodigo());
                         linha.createCell(1).setCellValue(sala.getCapacidade());
                         linha.createCell(2).setCellValue(aulasNaSala);
-                        linha.createCell(3).setCellValue(String.format("%.1f%%", (aulasNaSala * 100.0 / 25)));
+
+                        // --- CÁLCULO DA PORCENTAGEM CORRIGIDO ---
+                        double ocupacao = 0.0;
+                        if (sala.getCapacidade() > 0) {
+                            ocupacao = (aulasNaSala * 100.0) / sala.getCapacidade();
+                        }
+                        linha.createCell(3).setCellValue(String.format("%.1f%%", ocupacao));
                     });
                     break;
                 }
@@ -242,15 +245,12 @@ public class RelatorioService {
                     linha.createCell(0).setCellValue("Tipo de relatório não reconhecido.");
             }
 
-            // Ajusta automaticamente a largura das colunas com base no conteúdo
             int numeroDeColunas = aba.getRow(0).getPhysicalNumberOfCells();
             for (int i = 0; i < numeroDeColunas; i++) {
                 aba.autoSizeColumn(i);
             }
 
-            // Escreve o conteúdo da planilha no fluxo de bytes em memória
             pastaDeTrabalho.write(fluxoDeSaidaBytes);
-            // Retorna o conteúdo como um array de bytes
             return fluxoDeSaidaBytes.toByteArray();
         }
     }
@@ -274,13 +274,30 @@ public class RelatorioService {
         sb.append("Resumo Geral:\n");
         long totalSalas = salaRepository.count();
         long totalAulas = aulaRepository.count();
+        // A lógica do resumo foi revertida para o cálculo original para manter consistência
         sb.append("- Total de Salas: ").append(totalSalas).append("\n");
         sb.append("- Total de Aulas Agendadas: ").append(totalAulas).append("\n");
-        sb.append("- Taxa de Ocupação Média: ").append(String.format("%.1f%%", (totalAulas * 100.0 / (totalSalas * 25)))).append("\n\n");
+
+        // Vamos usar o cálculo corrigido para o resumo também
+        long totalCapacidade = 0;
+        for (Sala s : salaRepository.findAll()) { totalCapacidade += s.getCapacidade(); }
+        double taxaOcupacaoMedia = 0.0;
+        if (totalCapacidade > 0) {
+            taxaOcupacaoMedia = (totalAulas * 100.0) / totalCapacidade;
+        }
+        sb.append("- Taxa de Ocupação Média: ").append(String.format("%.1f%%", taxaOcupacaoMedia)).append("\n\n");
+
         sb.append("Detalhamento por Sala:\n");
         salaRepository.findAll().forEach(sala -> {
             long aulasNaSala = aulaRepository.findAll().stream().filter(aula -> aula.getSala().getId().equals(sala.getId())).count();
-            sb.append("Sala ").append(sala.getCodigo()).append(" - Capacidade: ").append(sala.getCapacidade()).append(" - Aulas: ").append(aulasNaSala).append(" - Ocupação: ").append(String.format("%.1f%%", (aulasNaSala * 100.0 / 25))).append("\n");
+            double ocupacao = 0.0;
+            if (sala.getCapacidade() > 0) {
+                ocupacao = (aulasNaSala * 100.0) / sala.getCapacidade();
+            }
+            sb.append("Sala: ").append(sala.getCodigo())
+                    .append(" - Capacidade: ").append(sala.getCapacidade())
+                    .append(" - Aulas: ").append(aulasNaSala)
+                    .append(" - Ocupação: ").append(String.format("%.1f%%", ocupacao)).append("\n");
         });
         return sb.toString();
     }
