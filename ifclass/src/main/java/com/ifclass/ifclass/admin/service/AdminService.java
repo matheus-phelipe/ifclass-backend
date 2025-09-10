@@ -174,57 +174,70 @@ public class AdminService {
     public List<LogSistemaDTO> getLogsSistema() {
         // Simulação de logs mais realistas - em produção, isso viria de um sistema de logging real
         List<LogSistemaDTO> logs = new ArrayList<>();
+        List<String> arquivos = List.of("logs/ifclass.log", "logs/security.log");
 
-        // Gerar logs dinâmicos baseados no tempo atual
-        LocalDateTime agora = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        long id = 1;
 
-        // Log mais recente (sempre novo)
-        logs.add(new LogSistemaDTO(1L, agora.minusSeconds(30), "INFO", "SYSTEM",
-            "Monitoramento ativo", "system", "localhost", "Sistema funcionando normalmente"));
+        for (String arquivo : arquivos) {
+            Path path = Paths.get(arquivo);
 
-        logs.add(new LogSistemaDTO(2L, agora.minusMinutes(1), "INFO", "API",
-            "Requisição processada", "admin@ifclass.com", "192.168.1.100", "GET /api/admin/logs"));
+            if (!Files.exists(path)) continue;
 
-        logs.add(new LogSistemaDTO(3L, agora.minusMinutes(2), "INFO", "AUTH",
-            "Sessão validada", "admin@ifclass.com", "192.168.1.100", "Token JWT válido"));
+            try {
+                List<String> linhas = Files.readAllLines(path);
 
-        logs.add(new LogSistemaDTO(4L, agora.minusMinutes(3), "INFO", "CRUD",
-            "Dados consultados", "admin@ifclass.com", "192.168.1.100", "Consulta de estatísticas"));
+                for (String linha : linhas) {
+                    String dataStr;
+                    String thread = "main";
+                    String nivel;
+                    String mensagem;
 
-        logs.add(new LogSistemaDTO(5L, LocalDateTime.now().minusMinutes(15), "INFO", "AUTH",
-            "Usuário logado com sucesso", "professor@ifclass.com", "192.168.1.102", "Login realizado via mobile"));
+                    if (linha.contains("[")) {
+                        // Formato do ifclass.log
+                        String[] partes = linha.split(" ", 5);
+                        if (partes.length < 5) continue;
 
-        logs.add(new LogSistemaDTO(6L, LocalDateTime.now().minusMinutes(18), "INFO", "CRUD",
-            "Sala atualizada", "admin@ifclass.com", "192.168.1.100", "Sala A101 - Capacidade alterada"));
+                        dataStr = partes[0] + " " + partes[1];
+                        thread = partes[2].replace("[", "").replace("]", "");
+                        nivel = partes[3];
+                        mensagem = partes[4];
+                    } else {
+                        // Formato do security.log
+                        String[] partes = linha.split(" ", 3);
+                        if (partes.length < 3) continue;
 
-        logs.add(new LogSistemaDTO(7L, LocalDateTime.now().minusMinutes(22), "DEBUG", "API",
-            "Requisição processada", "system", "192.168.1.103", "GET /api/aulas - 200ms"));
+                        dataStr = partes[0] + " " + partes[1];
+                        nivel = partes[2].split(" - ", 2)[0];
+                        mensagem = linha.substring(dataStr.length() + nivel.length() + 2);
+                    }
 
-        logs.add(new LogSistemaDTO(8L, LocalDateTime.now().minusMinutes(25), "INFO", "CRUD",
-            "Novo usuário cadastrado", "admin@ifclass.com", "192.168.1.100", "Professor João Silva"));
+                    LocalDateTime dataLog;
+                    try {
+                        dataLog = LocalDateTime.parse(dataStr, formatter);
+                    } catch (Exception e) {
+                        dataLog = LocalDateTime.now();
+                    }
 
-        logs.add(new LogSistemaDTO(9L, LocalDateTime.now().minusMinutes(30), "WARN", "AUTH",
-            "Tentativa de login falhada", "unknown", "192.168.1.200", "Email: teste@teste.com - 3ª tentativa"));
+                    logs.add(new LogSistemaDTO(
+                            id++,
+                            dataLog,
+                            nivel,
+                            thread,
+                            "Sistema",      // origem genérica
+                            "system",       // usuário genérico
+                            "localhost",    // host genérico
+                            mensagem
+                    ));
+                }
 
-        logs.add(new LogSistemaDTO(10L, LocalDateTime.now().minusMinutes(35), "ERROR", "DATABASE",
-            "Timeout na consulta", "system", "localhost", "Query: SELECT * FROM aulas - Timeout: 30s"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-        logs.add(new LogSistemaDTO(11L, LocalDateTime.now().minusMinutes(40), "INFO", "AUTH",
-            "Usuário deslogado", "coordenador@ifclass.com", "192.168.1.101", "Logout por inatividade"));
-
-        logs.add(new LogSistemaDTO(12L, LocalDateTime.now().minusMinutes(45), "INFO", "SYSTEM",
-            "Sistema iniciado", "system", "localhost", "IFClass v1.0.0 - Startup completo"));
-
-        // Logs mais antigos (para testar funcionalidade de limpeza)
-        logs.add(new LogSistemaDTO(13L, LocalDateTime.now().minusHours(3), "INFO", "AUTH",
-            "Usuário logado", "admin@ifclass.com", "192.168.1.100", "Login matinal"));
-
-        logs.add(new LogSistemaDTO(14L, LocalDateTime.now().minusHours(4), "ERROR", "SYSTEM",
-            "Erro crítico resolvido", "system", "localhost", "Reinicialização automática executada"));
-
-        logs.add(new LogSistemaDTO(15L, LocalDateTime.now().minusHours(6), "INFO", "BACKUP",
-            "Backup semanal", "system", "localhost", "Backup completo do banco de dados"));
-
+        // Ordenar logs por data decrescente (mais recentes primeiro)
+        logs.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
         return logs;
     }
 
