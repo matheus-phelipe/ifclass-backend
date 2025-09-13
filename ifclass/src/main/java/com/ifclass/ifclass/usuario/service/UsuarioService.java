@@ -98,13 +98,17 @@ public class UsuarioService {
         var encoder = new BCryptPasswordEncoder();
         usuario.setSenha(encoder.encode(usuario.getSenha()));
 
-        usuario.setAuthorities(Collections.singletonList(RoleUsuario.ROLE_ALUNO.toString()));
+        // Se o front não mandar authorities, define padrão ROLE_ALUNO
+        if (usuario.getAuthorities() == null || usuario.getAuthorities().isEmpty()) {
+            usuario.setAuthorities(Collections.singletonList(RoleUsuario.ROLE_ALUNO.toString()));
+        }
 
         repository.save(usuario);
         usuario.setSenha(null);
 
         return usuario;
     }
+
 
     @CacheEvict(value = "usuarios", allEntries = true)
     public void excluir(Long id) {
