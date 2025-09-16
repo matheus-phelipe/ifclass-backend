@@ -25,10 +25,9 @@ public class CursoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED) // Retorna 201 Created para sucesso
-    public Curso salvar(@RequestBody Curso curso) {
-        // A exceção ResourceConflictException (se houver duplicidade) será lançada aqui
-        // e capturada pelo GlobalExceptionHandler.
-        return service.salvar(curso);
+    public ResponseEntity<Curso> salvar(@RequestBody Curso curso) {
+        Curso salvo = service.salvar(curso); // salva no banco
+        return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 
     @PutMapping("/{id}")

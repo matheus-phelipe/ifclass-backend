@@ -10,10 +10,10 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity // Mapeia esta classe para uma tabela de banco de dados
+@Entity
 public class Curso {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Gera ID automaticamente, bom para PostgreSQL
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
     private String codigo;
