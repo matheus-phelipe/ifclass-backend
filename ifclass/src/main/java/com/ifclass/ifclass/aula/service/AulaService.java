@@ -2,6 +2,8 @@ package com.ifclass.ifclass.aula.service;
 
 import com.ifclass.ifclass.aula.model.Aula;
 import com.ifclass.ifclass.aula.repository.AulaRepository;
+import com.ifclass.ifclass.util.log.AppLogger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
@@ -17,15 +19,26 @@ public class AulaService {
     @Autowired
     private AulaRepository repository;
 
+    @Autowired
+    private AppLogger appLogger;
+
     public Aula salvar(Aula aula) {
-        return repository.save(aula);
+        String operacao = (aula.getId() == null) ? "CRIACAO" : "ATUALIZACAO";
+
+        Aula aulaSalva = repository.save(aula);
+
+        appLogger.logCrudSuccess("Aula", operacao, "ID: " + aulaSalva.getId());
+
+        return aulaSalva;
     }
 
     public void remover(Long id) {
         if (!repository.existsById(id)) {
+            appLogger.logCrudWarning("Aula", "REMOCAO", "Tentativa de remover aula não encontrada com ID: " + id);
             throw new RuntimeException("Aula não encontrada com o id: " + id);
         }
         repository.deleteById(id);
+        appLogger.logCrudSuccess("Aula", "REMOCAO", "ID: " + id);
     }
 
     public List<Aula> buscarPorTurmaEData(Long turmaId, LocalDate data) {

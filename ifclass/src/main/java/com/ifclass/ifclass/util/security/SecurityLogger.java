@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Logger especializado para eventos de segurança
@@ -15,20 +13,15 @@ import java.time.format.DateTimeFormatter;
 public class SecurityLogger {
     
     private static final Logger logger = LoggerFactory.getLogger("SECURITY");
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     
     /**
      * Log de tentativa de login
      */
     public void logLoginAttempt(String email, String ip, boolean success) {
-        String status = success ? "SUCCESS" : "FAILED";
-        String message = String.format("[%s] LOGIN_%s - Email: %s, IP: %s", 
-            LocalDateTime.now().format(formatter), status, email, ip);
-        
         if (success) {
-            logger.info(message);
+            logger.info("LOGIN_SUCCESS | Email: {} | IP: {}", email, ip);
         } else {
-            logger.warn(message);
+            logger.warn("LOGIN_FAILED | Email: {} | IP: {}", email, ip);
         }
     }
     
@@ -36,18 +29,14 @@ public class SecurityLogger {
      * Log de logout
      */
     public void logLogout(String email, String ip) {
-        String message = String.format("[%s] LOGOUT - Email: %s, IP: %s", 
-            LocalDateTime.now().format(formatter), email, ip);
-        logger.info(message);
+        logger.info("LOGOUT | Email: {} | IP: {}", email, ip);
     }
     
     /**
      * Log de tentativa de acesso não autorizado
      */
     public void logUnauthorizedAccess(String uri, String ip, String userAgent) {
-        String message = String.format("[%s] UNAUTHORIZED_ACCESS - URI: %s, IP: %s, UserAgent: %s", 
-            LocalDateTime.now().format(formatter), uri, ip, userAgent);
-        logger.warn(message);
+        logger.warn("UNAUTHORIZED_ACCESS | URI: {} | IP: {} | User-Agent: {}", uri, ip, userAgent);
     }
     
     /**
@@ -56,56 +45,44 @@ public class SecurityLogger {
     public void logInvalidToken(String ip, String token) {
         String tokenPreview = token != null && token.length() > 10 ? 
             token.substring(0, 10) + "..." : "null";
-        String message = String.format("[%s] INVALID_TOKEN - IP: %s, Token: %s", 
-            LocalDateTime.now().format(formatter), ip, tokenPreview);
-        logger.warn(message);
+        logger.warn("INVALID_TOKEN | IP: {} | Token: {}", ip, tokenPreview);
     }
     
     /**
      * Log de tentativa de XSS
      */
     public void logXSSAttempt(String input, String ip, String uri) {
-        String message = String.format("[%s] XSS_ATTEMPT - URI: %s, IP: %s, Input: %s", 
-            LocalDateTime.now().format(formatter), uri, ip, 
-            input.length() > 100 ? input.substring(0, 100) + "..." : input);
-        logger.error(message);
+        String safeInput = input.length() > 100 ? input.substring(0, 100) + "..." : input;
+        logger.error("XSS_ATTEMPT | URI: {} | IP: {} | Input: {}", uri, ip, safeInput);
     }
     
     /**
      * Log de tentativa de SQL Injection
      */
     public void logSQLInjectionAttempt(String input, String ip, String uri) {
-        String message = String.format("[%s] SQL_INJECTION_ATTEMPT - URI: %s, IP: %s, Input: %s", 
-            LocalDateTime.now().format(formatter), uri, ip, 
-            input.length() > 100 ? input.substring(0, 100) + "..." : input);
-        logger.error(message);
+        String safeInput = input.length() > 100 ? input.substring(0, 100) + "..." : input;
+        logger.error("SQL_INJECTION_ATTEMPT | URI: {} | IP: {} | Input: {}", uri, ip, safeInput);
     }
     
     /**
      * Log de mudança de senha
      */
     public void logPasswordChange(String email, String ip) {
-        String message = String.format("[%s] PASSWORD_CHANGE - Email: %s, IP: %s", 
-            LocalDateTime.now().format(formatter), email, ip);
-        logger.info(message);
+        logger.info("PASSWORD_CHANGE | Email: {} | IP: {}", email, ip);
     }
     
     /**
      * Log de criação de usuário
      */
     public void logUserCreation(String email, String createdBy, String ip) {
-        String message = String.format("[%s] USER_CREATED - Email: %s, CreatedBy: %s, IP: %s", 
-            LocalDateTime.now().format(formatter), email, createdBy, ip);
-        logger.info(message);
+        logger.info("USER_CREATED | Email: {} | CreatedBy: {} | IP: {}", email, createdBy, ip);
     }
     
     /**
      * Log de erro de sistema
      */
     public void logSystemError(String operation, String error, String ip) {
-        String message = String.format("[%s] SYSTEM_ERROR - Operation: %s, Error: %s, IP: %s", 
-            LocalDateTime.now().format(formatter), operation, error, ip);
-        logger.error(message);
+        logger.error("SYSTEM_ERROR | Operation: {} | Error: {} | IP: {}", operation, error, ip);
     }
     
     /**

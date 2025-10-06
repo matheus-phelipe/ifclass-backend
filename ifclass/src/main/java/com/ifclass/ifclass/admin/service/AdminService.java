@@ -172,74 +172,91 @@ public class AdminService {
     }
 
     public List<LogSistemaDTO> getLogsSistema() {
-        // Simulação de logs mais realistas - em produção, isso viria de um sistema de logging real
         List<LogSistemaDTO> logs = new ArrayList<>();
-        List<String> arquivos = List.of("logs/ifclass.log", "logs/security.log");
+        String userHome = System.getProperty("user.home");
+        List<String> arquivos = List.of(
+            userHome + "/ifclass/logs/ifclass.log",
+            userHome + "/ifclass/logs/security.log"
+        );
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         long id = 1;
+
+         java.util.regex.Pattern datePattern = java.util.regex.Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})");
 
         for (String arquivo : arquivos) {
             Path path = Paths.get(arquivo);
-
             if (!Files.exists(path)) continue;
 
             try {
                 List<String> linhas = Files.readAllLines(path);
 
                 for (String linha : linhas) {
-                    String dataStr;
-                    String thread = "main";
-                    String nivel;
-                    String mensagem;
-
-                    if (linha.contains("[")) {
-                        // Formato do ifclass.log
-                        String[] partes = linha.split(" ", 5);
-                        if (partes.length < 5) continue;
-
-                        dataStr = partes[0] + " " + partes[1];
-                        thread = partes[2].replace("[", "").replace("]", "");
-                        nivel = partes[3];
-                        mensagem = partes[4];
-                    } else {
-                        // Formato do security.log
-                        String[] partes = linha.split(" ", 3);
-                        if (partes.length < 3) continue;
-
-                        dataStr = partes[0] + " " + partes[1];
-                        nivel = partes[2].split(" - ", 2)[0];
-                        mensagem = linha.substring(dataStr.length() + nivel.length() + 2);
-                    }
-
-                    LocalDateTime dataLog;
+                java.util.regex.Matcher matcher = datePattern.matcher(linha);
+                if (matcher.find()) {
                     try {
-                        dataLog = LocalDateTime.parse(dataStr, formatter);
+                        String dataStr = matcher.group(1);
+                        LocalDateTime dataLog = LocalDateTime.parse(dataStr, formatter);
+                        String restoDaLinha = linha.substring(matcher.end()).trim();
+                        
+                        String thread = "main";
+                        String nivel, mensagem, categoria, usuario = "system", ip = "localhost", detalhes = "";
+
+                        if (linha.contains("[")) { // Formato ifclass.log
+                            String[] partes = restoDaLinha.split(" ", 4);
+                            if (partes.length < 4) continue;
+                            thread = partes[0].replace("[", "").replace("]", "");
+                            nivel = partes[1];
+                            mensagem = partes[3];
+                            String lowerCaseLine = linha.toLowerCase();
+
+                            if (lowerCaseLine.contains("org.hibernate") || lowerCaseLine.contains("hikari") || lowerCaseLine.contains("database") || lowerCaseLine.contains(" jpa ") || lowerCaseLine.contains(" sql ")) {
+                                categoria = "Database";
+                            } else if (lowerCaseLine.contains("tomcat") || lowerCaseLine.contains("coyote") || lowerCaseLine.contains("http-nio") || lowerCaseLine.contains("network")) {
+                                categoria = "Network";
+                            } else {
+                                categoria = "Application";
+                            }
+                        } else { // Formato security.log
+                            String[] partes = restoDaLinha.split(" - ", 2);
+                            if (partes.length < 2) continue;
+                            nivel = partes[0].trim();
+                            mensagem = partes[1].trim();
+                            
+                            String[] partesMensagem = mensagem.split(" \\| ");
+                            categoria = "Security";
+                            
+                            for (String detalhe : partesMensagem) {
+                                if (detalhe.trim().startsWith("Email:")) usuario = detalhe.split(":")[1].trim();
+                                else if (detalhe.trim().startsWith("IP:")) ip = detalhe.split(":")[1].trim();
+                                else if (detalhe.trim().startsWith("Token:")) detalhes = detalhe.split(":")[1].trim();
+                            }
+                        }
+                        String nivelOriginal = nivel;
+                        switch (nivelOriginal.toUpperCase()) {
+                            case "ERROR":
+                            case "WARN":
+                            case "INFO":
+                            case "DEBUG":
+                                break;
+                            default:
+                                // Converte qualquer outro nível (WATCHER, CONNECTING, etc.) para INFO
+                                nivel = "INFO";
+                                break;
+                        }
+                        logs.add(new LogSistemaDTO(id++, dataLog, nivel, categoria, mensagem, usuario, ip, detalhes));
                     } catch (Exception e) {
-                        dataLog = LocalDateTime.now();
+                        System.err.println("Erro ao processar linha de log: " + linha + " | Erro: " + e.getMessage());
                     }
-
-                    logs.add(new LogSistemaDTO(
-                            id++,
-                            dataLog,
-                            nivel,
-                            thread,
-                            "Sistema",      // origem genérica
-                            "system",       // usuário genérico
-                            "localhost",    // host genérico
-                            mensagem
-                    ));
                 }
-
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        // Ordenar logs por data decrescente (mais recentes primeiro)
-        logs.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
-        return logs;
     }
+    logs.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
+    return logs;
+}
 
     public String criarBackupReal() throws IOException {
         // Criar diretório de backup se não existir
