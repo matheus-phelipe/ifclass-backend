@@ -15,6 +15,12 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // Registra nosso interceptor para ser aplicado a TODAS as rotas da aplicação ("/**")
-        registry.addInterceptor(loggingInterceptor).addPathPatterns("/**");
+        registry.addInterceptor(loggingInterceptor).addPathPatterns("/**").excludePathPatterns(
+                "/api/admin/sistema/logs/**", 
+                "/actuator/**",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/error"
+            );;
     }
 }
