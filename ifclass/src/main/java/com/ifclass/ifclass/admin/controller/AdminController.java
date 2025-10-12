@@ -65,10 +65,8 @@ public class AdminController {
             @RequestParam(required = false) String termoBusca
     ) throws IOException {
 
-        // 1. Busca a lista completa de logs (como antes)
         List<LogSistemaDTO> todosOsLogs = adminService.getLogsSistema();
 
-        // 2. Aplica todos os filtros recebidos na lista em memória
         List<LogSistemaDTO> logsFiltrados = todosOsLogs.stream()
             .filter(log -> {
                 // Filtro de Data de Início
@@ -101,11 +99,10 @@ public class AdminController {
                         return false;
                     }
                 }
-                return true; // Se passar por todos os filtros, mantém o log
+                return true;
             })
             .collect(Collectors.toList());
 
-        // 3. Gera o arquivo Excel apenas com os logs filtrados
         ByteArrayInputStream in = excelExportService.logsToExcel(logsFiltrados);
         
         HttpHeaders headers = new HttpHeaders();
