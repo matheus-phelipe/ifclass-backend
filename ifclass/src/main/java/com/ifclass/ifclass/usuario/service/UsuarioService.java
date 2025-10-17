@@ -100,7 +100,7 @@ public class UsuarioService {
     public Usuario cadastrar(Usuario usuario) {
         if (repository.findByEmail(usuario.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email já cadastrado");
-        }
+        } 
 
         var encoder = new BCryptPasswordEncoder();
         usuario.setSenha(encoder.encode(usuario.getSenha()));
@@ -109,10 +109,15 @@ public class UsuarioService {
             usuario.setAuthorities(Collections.singletonList(RoleUsuario.ROLE_ALUNO.toString()));
         }
 
-        repository.save(usuario);
-        usuario.setSenha(null);
+        Usuario usuarioSalvo = repository.save(usuario);
+        Usuario usuarioResposta = new Usuario();
+        usuarioResposta.setId(usuarioSalvo.getId());
+        usuarioResposta.setNome(usuarioSalvo.getNome());
+        usuarioResposta.setEmail(usuarioSalvo.getEmail());
+        usuarioResposta.setProntuario(usuarioSalvo.getProntuario());
+        usuarioResposta.setAuthorities(usuarioSalvo.getAuthorities());
 
-        return usuario;
+        return usuarioResposta;
     }
 
     @CacheEvict(value = "usuarios", allEntries = true)
