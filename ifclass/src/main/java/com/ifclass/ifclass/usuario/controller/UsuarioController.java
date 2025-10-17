@@ -9,11 +9,14 @@ import com.ifclass.ifclass.util.JwtUtil;
 import com.ifclass.ifclass.util.security.InputValidator;
 import com.ifclass.ifclass.util.security.SecurityLogger;
 import com.ifclass.ifclass.disciplina.model.Disciplina;
+import com.ifclass.ifclass.usuario.excel.BatchExcelResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -172,5 +175,18 @@ public class UsuarioController {
     @GetMapping("/{professorId}/disciplinas")
     public ResponseEntity<Set<Disciplina>> listarDisciplinas(@PathVariable Long professorId) {
         return ResponseEntity.ok(service.listarDisciplinas(professorId));
+    }
+
+    @PostMapping(value = "/excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BatchExcelResult> importarUsuarios(@RequestParam("file") MultipartFile file) {
+        try {
+            BatchExcelResult result = service.importarUsuariosExcel(file);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            BatchExcelResult errorResult = new BatchExcelResult();
+            errorResult.addError(0, "Erro interno ao processar importação: " + e.getMessage());
+            errorResult.setCreatedCount(0);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResult);
+        }
     }
 }

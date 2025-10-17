@@ -16,6 +16,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
@@ -23,6 +24,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+// === Importações Apache POI ===
+import org.apache.poi.ss.usermodel.*;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+
+import com.ifclass.ifclass.usuario.excel.BatchExcelResult;
 
 @Service
 public class UsuarioService {
@@ -59,12 +68,10 @@ public class UsuarioService {
         dto.setProntuario(usuario.getProntuario());
         dto.setAuthorities(usuario.getAuthorities());
 
-        // Se for professor, buscar disciplinas
         if (usuario.getAuthorities().contains("ROLE_PROFESSOR")) {
             dto.setDisciplinas(usuario.getDisciplinas());
         }
 
-        // Se for aluno, buscar turma
         if (usuario.getAuthorities().contains("ROLE_ALUNO")) {
             List<AlunoTurma> vinculos = alunoTurmaRepository.findByAluno(usuario);
             if (!vinculos.isEmpty()) {
@@ -93,22 +100,25 @@ public class UsuarioService {
     public Usuario cadastrar(Usuario usuario) {
         if (repository.findByEmail(usuario.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email já cadastrado");
-        }
+        } 
 
         var encoder = new BCryptPasswordEncoder();
         usuario.setSenha(encoder.encode(usuario.getSenha()));
 
-        // Se o front não mandar authorities, define padrão ROLE_ALUNO
         if (usuario.getAuthorities() == null || usuario.getAuthorities().isEmpty()) {
             usuario.setAuthorities(Collections.singletonList(RoleUsuario.ROLE_ALUNO.toString()));
         }
 
-        repository.save(usuario);
-        usuario.setSenha(null);
+        Usuario usuarioSalvo = repository.save(usuario);
+        Usuario usuarioResposta = new Usuario();
+        usuarioResposta.setId(usuarioSalvo.getId());
+        usuarioResposta.setNome(usuarioSalvo.getNome());
+        usuarioResposta.setEmail(usuarioSalvo.getEmail());
+        usuarioResposta.setProntuario(usuarioSalvo.getProntuario());
+        usuarioResposta.setAuthorities(usuarioSalvo.getAuthorities());
 
-        return usuario;
+        return usuarioResposta;
     }
-
 
     @CacheEvict(value = "usuarios", allEntries = true)
     public void excluir(Long id) {
@@ -130,11 +140,11 @@ public class UsuarioService {
             }
         }
 
-        return Optional.empty(); // E-mail não existe ou senha incorreta
+        return Optional.empty();
     }
 
     @CacheEvict(value = "usuarios", allEntries = true)
-    public Usuario atualizarAuthorities(Long id,  List<String> authorities) {
+    public Usuario atualizarAuthorities(Long id, List<String> authorities) {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
@@ -148,14 +158,12 @@ public class UsuarioService {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
 
-        // Verificar se já existe outro usuário com o mesmo email
         repository.findByEmail(usuarioAtualizado.getEmail()).ifPresent(u -> {
             if (!u.getId().equals(id)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Email já está em uso");
             }
         });
 
-        // Verificar se já existe outro usuário com o mesmo prontuário
         repository.findByProntuario(usuarioAtualizado.getProntuario()).ifPresent(u -> {
             if (!u.getId().equals(id)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Prontuário já está em uso");
@@ -191,5 +199,115 @@ public class UsuarioService {
         Usuario professor = repository.findById(professorId)
             .orElseThrow(() -> new EntityNotFoundException("Professor não encontrado"));
         return professor.getDisciplinas();
+    }
+
+    // =========================
+    // MÉTODO PARA IMPORTAÇÃO EM LOTE VIA EXCEL (Apache POI)
+    // =========================
+    @CacheEvict(value = "usuarios", allEntries = true)
+    public BatchExcelResult importarUsuariosExcel(MultipartFile file) {
+        BatchExcelResult result = new BatchExcelResult();
+        int created = 0;
+
+        if (file == null || file.isEmpty()) {
+            result.addError(0, "Arquivo vazio.");
+            result.setCreatedCount(0);
+            return result;
+        }
+
+        try (InputStream is = file.getInputStream();
+             Workbook workbook = WorkbookFactory.create(is)) {
+
+            Sheet sheet = workbook.getSheetAt(0);
+            if (sheet == null) {
+                result.addError(0, "Planilha vazia.");
+                result.setCreatedCount(0);
+                return result;
+            }
+
+            DataFormatter dataFormatter = new DataFormatter();
+
+            for (Row row : sheet) {
+                int rowIndex = row.getRowNum() + 1;
+                if (row.getRowNum() == 0) continue; // Pula o cabeçalho
+
+                // Leitura robusta das células usando DataFormatter
+                String nome = dataFormatter.formatCellValue(row.getCell(0)).trim();
+                String email = dataFormatter.formatCellValue(row.getCell(1)).trim();
+                String senha = dataFormatter.formatCellValue(row.getCell(2)).trim();
+                String prontuario = dataFormatter.formatCellValue(row.getCell(3)).trim();
+                String permissoesRaw = dataFormatter.formatCellValue(row.getCell(4)).trim();
+
+                // Validações
+                if (nome.isBlank()) {
+                    result.addError(rowIndex, "Nome vazio.");
+                    continue;
+                }
+                if (email.isBlank()) {
+                    result.addError(rowIndex, "Email vazio.");
+                    continue;
+                }
+                if (senha.isBlank()) {
+                    result.addError(rowIndex, "Senha vazia.");
+                    continue;
+                }
+
+                if (repository.findByEmail(email).isPresent()) {
+                    result.addError(rowIndex, "Email já cadastrado: " + email);
+                    continue;
+                }
+                if (!prontuario.isBlank() && repository.findByProntuario(prontuario).isPresent()) {
+                    result.addError(rowIndex, "Prontuário já cadastrado: " + prontuario);
+                    continue;
+                }
+
+                List<String> authorities = parseAuthorities(permissoesRaw);
+                if (authorities.isEmpty()) {
+                    authorities = Collections.singletonList(RoleUsuario.ROLE_ALUNO.toString());
+                }
+
+                Usuario u = new Usuario();
+                u.setNome(nome);
+                u.setEmail(email);
+                u.setSenha(senha); // A senha será criptografada pelo método cadastrar
+                u.setProntuario(prontuario);
+                u.setAuthorities(authorities);
+
+                try {
+                    cadastrar(u);
+                    created++;
+                } catch (Exception e) {
+                    result.addError(rowIndex, "Erro ao criar usuário: " + e.getMessage());
+                }
+            }
+
+            result.setCreatedCount(created);
+            return result;
+
+        } catch (Exception e) {
+            result.addError(0, "Erro ao processar arquivo: " + e.getMessage());
+            result.setCreatedCount(created);
+            return result;
+        }
+    }
+    
+    // Método para tratar as permissões (sem alterações, mas mantido aqui para contexto)
+    private List<String> parseAuthorities(String raw) {
+        if (raw == null || raw.isBlank()) return new ArrayList<>();
+        String[] parts = raw.split("[,;|/]");
+        List<String> out = new ArrayList<>();
+        for (String p : parts) {
+            if (p == null) continue;
+            String trimmed = p.trim().toUpperCase();
+            if (trimmed.isEmpty()) continue;
+            if (!trimmed.startsWith("ROLE_")) {
+                trimmed = "ROLE_" + trimmed;
+            }
+            if (trimmed.equals("ROLE_ALUNO") || trimmed.equals("ROLE_PROFESSOR")
+                || trimmed.equals("ROLE_COORDENADOR") || trimmed.equals("ROLE_ADMIN")) {
+                out.add(trimmed);
+            }
+        }
+        return out;
     }
 }
