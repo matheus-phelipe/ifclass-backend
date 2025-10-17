@@ -14,7 +14,6 @@ import com.ifclass.ifclass.common.service.PerformanceMonitoringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
@@ -173,10 +172,9 @@ public class AdminService {
 
     public List<LogSistemaDTO> getLogsSistema() {
         List<LogSistemaDTO> logs = new ArrayList<>();
-        String userHome = System.getProperty("user.home");
         List<String> arquivos = List.of(
-            userHome + "/ifclass/logs/ifclass.log",
-            userHome + "/ifclass/logs/security.log"
+            "logs/ifclass.log",
+            "logs/security.log"
         );
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
