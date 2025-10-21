@@ -45,4 +45,10 @@ public class SystemSettingController {
     public void deleteSetting(@PathVariable String key) {
         service.deleteSetting(key);
     }
+
+    @PostMapping("/reset")
+    public ResponseEntity<Void> resetSettings() {
+        service.resetToDefaults();
+        return ResponseEntity.ok().build();
+    }
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,5 +68,37 @@ public class SystemSettingService {
         return repository.findById(key)
                 .map(setting -> Boolean.parseBoolean(setting.getConfigValue()))
                 .orElse(false); // Retorna false se não encontrar ou falhar a conversão
+    }
+    
+    @Transactional
+    public void resetToDefaults() {
+        // 1. Apaga todas as configurações personalizadas existentes
+        repository.deleteAll();
+
+        // 2. Obtém a lista de valores padrão
+        List<SystemSetting> defaultSettings = getValoresPadrao();
+
+        // 3. Salva os valores padrão no banco
+        repository.saveAll(defaultSettings);
+    }
+
+    // ----- ADICIONAR ESTE MÉTODO AUXILIAR -----
+    /**
+     * Retorna a lista de configurações padrão do sistema.
+     */
+    private List<SystemSetting> getValoresPadrao() {
+        List<SystemSetting> defaults = new ArrayList<>();
+
+        // (Use os mesmos valores que estavam mockados no seu frontend)
+        defaults.add(new SystemSetting("app.name", "IFClass", "Nome da aplicação", "STRING", false));
+        defaults.add(new SystemSetting("session.timeout", "3600", "Timeout da sessão em segundos", "NUMBER", true));
+        defaults.add(new SystemSetting("security.max.login.attempts", "5", "Máximo de tentativas de login", "NUMBER", true));
+        defaults.add(new SystemSetting("backup.enabled", "true", "Backup automático habilitado", "BOOLEAN", true));
+        defaults.add(new SystemSetting("backup.time", "03:00", "Horário do backup automático", "STRING", true));
+        
+        // (Você vai precisar de um construtor na sua entidade SystemSetting que aceite esses campos)
+        // Ex: public SystemSetting(String key, String value, String desc, String type, boolean admin) { ... }
+
+        return defaults;
     }
 }
