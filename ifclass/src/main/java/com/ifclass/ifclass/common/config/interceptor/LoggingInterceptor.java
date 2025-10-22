@@ -17,7 +17,6 @@ import com.ifclass.ifclass.util.log.LogWebSocketService;
 @Component
 public class LoggingInterceptor implements HandlerInterceptor {
 
-    // Usamos um logger padrão para este interceptor. Os logs irão para o ifclass.log
     private static final Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
 
     @Autowired
@@ -57,24 +56,41 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        long startTime = (Long) request.getAttribute("startTime");
+        
+    long startTime = (Long) request.getAttribute("startTime");
     long duration = System.currentTimeMillis() - startTime;
+    int status = response.getStatus();
+
+    String logLevel = "INFO"; 
+    String logCategory = "Network";
+
+    if (status >= 400 || ex != null) {
+        logLevel = "ERROR";
+        logCategory = "Application"; 
+    }
+    
 
     String logMessage = String.format("HTTP_RESPONSE | Status: %s | Duration: %dms | URI: %s",
-                                      response.getStatus(), duration, request.getRequestURI());
-    logger.info(logMessage);
+    status, duration, request.getRequestURI());
+
+    if ("ERROR".equals(logLevel)) {
+        logger.error(logMessage + (ex != null ? " | Exception: " + ex.getMessage() : ""));
+    } else {
+        logger.info(logMessage);
+    }
 
     LogSistemaDTO logDTO = new LogSistemaDTO(
         null,
         LocalDateTime.now(),
-        "INFO",
-        "Network",
+        logLevel,
+        logCategory,
         logMessage,
         "system",
         request.getRemoteAddr(),
-        ""
+        ex != null ? ex.getMessage() : ""
     );
-    logWebSocketService.sendLog(logDTO);
+
+    logWebSocketService.sendLog(logDTO);    
 
     if (ex != null) {
         String errorLogMessage = String.format("HTTP_ERROR | URI: %s | Error: %s", 
