@@ -148,7 +148,6 @@ public class UsuarioService {
         appLogger.logCrudSuccess("Usuario", "DELECAO", "ID: " + id);
     }
 
-    @Cacheable(value = "usuarios", key = "#login.email")
     public Optional<Usuario> logar(LoginDTO login) {
         Optional<Usuario> usuarioOpt = repository.findByEmail(login.getEmail());
 
@@ -167,7 +166,7 @@ public class UsuarioService {
                     "Senha deve ter pelo menos " + tamanhoMinimo + " caracteres");
             }
 
-            if (encoder.matches(login.getSenha(), usuario.getSenha()) || login.getSenha().equals(usuario.getSenha())) {
+            if (encoder.matches(login.getSenha(), usuario.getSenha())) {
                 // Log de debug se habilitado
                 if (configuracaoService.isModoDebug()) {
                     appLogger.logCrudSuccess("Usuario", "LOGIN", 
