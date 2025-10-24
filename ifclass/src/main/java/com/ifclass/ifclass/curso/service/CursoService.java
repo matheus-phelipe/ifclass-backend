@@ -4,6 +4,8 @@ import com.ifclass.ifclass.common.exception.ResourceConflictException;
 import com.ifclass.ifclass.common.exception.ResourceNotFoundException;
 import com.ifclass.ifclass.curso.model.Curso;
 import com.ifclass.ifclass.curso.repository.CursoRepository;
+import com.ifclass.ifclass.turma.repository.TurmaRepository;
+import com.ifclass.ifclass.disciplina.repository.DisciplinaRepository;
 import com.ifclass.ifclass.util.log.AppLogger;
 
 import jakarta.transaction.Transactional;
@@ -18,6 +20,12 @@ import java.util.Optional;
 public class CursoService {
     @Autowired
     private CursoRepository repo;
+
+    @Autowired
+    private TurmaRepository turmaRepository;
+
+    @Autowired
+    private DisciplinaRepository disciplinaRepository;
 
     @Autowired
     private AppLogger appLogger;
@@ -96,8 +104,67 @@ public class CursoService {
             appLogger.logCrudWarning("Curso", "EXCLUSAO", motivo);
             throw new ResourceNotFoundException("Curso não encontrado com ID: " + id + " para exclusão.");
         }
+
+        // Validar relacionamentos antes da exclusão
+        validarRelacionamentosAntesExclusao(id);
+
         repo.deleteById(id);
 
         appLogger.logCrudSuccess("Curso", "EXCLUSAO", "ID: " + id);
+    }
+
+    /**
+     * Valida se o curso possui relacionamentos que impedem sua exclusão
+     */
+    private void validarRelacionamentosAntesExclusao(Long cursoId) {
+        StringBuilder relacionamentos = new StringBuilder();
+        boolean temRelacionamentos = false;
+
+        // Verificar turmas relacionadas
+        long countTurmas = turmaRepository.count();
+        if (countTurmas > 0) {
+            // Verificar se existem turmas vinculadas a este curso
+            List<Object[]> turmasVinculadas = turmaRepository.findTurmasByCursoId(cursoId);
+            if (!turmasVinculadas.isEmpty()) {
+                temRelacionamentos = true;
+                relacionamentos.append("• ").append(turmasVinculadas.size()).append(" turma(s): ");
+                for (int i = 0; i < turmasVinculadas.size() && i < 3; i++) {
+                    Object[] turma = turmasVinculadas.get(i);
+                    relacionamentos.append("Turma ").append(turma[0]).append(" (").append(turma[1]).append("/").append(turma[2]).append(")");
+                    if (i < turmasVinculadas.size() - 1 && i < 2) relacionamentos.append(", ");
+                }
+                if (turmasVinculadas.size() > 3) {
+                    relacionamentos.append(" e mais ").append(turmasVinculadas.size() - 3).append(" turma(s)");
+                }
+                relacionamentos.append("\n");
+            }
+        }
+
+        // Verificar disciplinas relacionadas
+        long countDisciplinas = disciplinaRepository.count();
+        if (countDisciplinas > 0) {
+            // Verificar se existem disciplinas vinculadas a este curso
+            List<Object[]> disciplinasVinculadas = disciplinaRepository.findDisciplinasByCursoId(cursoId);
+            if (!disciplinasVinculadas.isEmpty()) {
+                temRelacionamentos = true;
+                relacionamentos.append("• ").append(disciplinasVinculadas.size()).append(" disciplina(s): ");
+                for (int i = 0; i < disciplinasVinculadas.size() && i < 3; i++) {
+                    Object[] disciplina = disciplinasVinculadas.get(i);
+                    relacionamentos.append(disciplina[0]).append(" (").append(disciplina[1]).append(")");
+                    if (i < disciplinasVinculadas.size() - 1 && i < 2) relacionamentos.append(", ");
+                }
+                if (disciplinasVinculadas.size() > 3) {
+                    relacionamentos.append(" e mais ").append(disciplinasVinculadas.size() - 3).append(" disciplina(s)");
+                }
+                relacionamentos.append("\n");
+            }
+        }
+
+        if (temRelacionamentos) {
+            String motivo = "Não é possível excluir o curso pois ele possui relacionamentos ativos:\n" + relacionamentos.toString() + 
+                           "\nPara excluir este curso, primeiro remova ou altere os relacionamentos listados acima.";
+            appLogger.logCrudWarning("Curso", "EXCLUSAO", motivo);
+            throw new ResourceConflictException(motivo);
+        }
     }
 }

@@ -37,14 +37,6 @@ public class ConfiguracaoSistemaService {
      * Inicializa as configurações padrão do sistema
      */
     public void inicializarConfiguracoesPadrao() {
-        // Sempre atualiza a configuração de senha mínima para 6
-        Optional<ConfiguracaoSistema> configSenha = configuracaoRepository.findByChave("security.password.min.length");
-        if (configSenha.isPresent()) {
-            configSenha.get().setValor("6");
-            configuracaoRepository.save(configSenha.get());
-            System.out.println("✅ Configuração de senha mínima atualizada para 6 caracteres");
-        }
-        
         if (configuracaoRepository.count() == 0) {
             criarConfiguracao("app.name", "IFClass", "STRING", "Nome da aplicação", "Geral", true);
             criarConfiguracao("app.version", "1.0.0", "STRING", "Versão da aplicação", "Geral", false);
