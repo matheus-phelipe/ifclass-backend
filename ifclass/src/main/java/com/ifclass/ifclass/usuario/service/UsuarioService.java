@@ -10,6 +10,7 @@ import com.ifclass.ifclass.disciplina.model.Disciplina;
 import com.ifclass.ifclass.disciplina.repository.DisciplinaRepository;
 import com.ifclass.ifclass.alunoTurma.repository.AlunoTurmaRepository;
 import com.ifclass.ifclass.alunoTurma.model.AlunoTurma;
+import com.ifclass.ifclass.admin.service.ConfiguracaoAplicacaoService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -39,6 +40,9 @@ public class UsuarioService {
 
     @Autowired
     private AlunoTurmaRepository alunoTurmaRepository;
+    
+    @Autowired
+    private ConfiguracaoAplicacaoService configuracaoService;
 
     @Cacheable(value = "usuarios", key = "'all'")
     public List<Usuario> listar() {
@@ -139,7 +143,24 @@ public class UsuarioService {
             Usuario usuario = usuarioOpt.get();
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
+            // Validar senha usando configurações do sistema
+            if (!configuracaoService.validarSenha(login.getSenha())) {
+                Integer tamanhoMinimo = configuracaoService.getTamanhoMinimoSenha();
+                if (tamanhoMinimo == null) tamanhoMinimo = 6; // valor padrão se configuração não existir
+                
+                appLogger.logServiceError("UsuarioService", "logar", 
+                    "Tentativa de login com senha inválida para usuário: " + login.getEmail());
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                    "Senha deve ter pelo menos " + tamanhoMinimo + " caracteres");
+            }
+
             if (encoder.matches(login.getSenha(), usuario.getSenha()) || login.getSenha().equals(usuario.getSenha())) {
+                // Log de debug se habilitado
+                if (configuracaoService.isModoDebug()) {
+                    appLogger.logCrudSuccess("Usuario", "LOGIN", 
+                        "Login realizado com sucesso: " + login.getEmail() + 
+                        " | Configurações: " + configuracaoService.getInformacoesDebug());
+                }
                 return Optional.of(usuario);
             }
         }

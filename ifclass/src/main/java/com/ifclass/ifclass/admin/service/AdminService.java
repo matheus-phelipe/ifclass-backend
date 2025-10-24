@@ -3,6 +3,7 @@ package com.ifclass.ifclass.admin.service;
 import com.ifclass.ifclass.admin.dto.EstatisticasAdminDTO;
 import com.ifclass.ifclass.admin.dto.LogSistemaDTO;
 import com.ifclass.ifclass.admin.dto.MonitoramentoSistemaDTO;
+import com.ifclass.ifclass.admin.dto.ConfiguracaoSistemaDTO;
 import com.ifclass.ifclass.aula.repository.AulaRepository;
 import com.ifclass.ifclass.curso.repository.CursoRepository;
 import com.ifclass.ifclass.disciplina.repository.DisciplinaRepository;
@@ -68,6 +69,9 @@ public class AdminService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    
+    @Autowired
+    private ConfiguracaoSistemaService configuracaoSistemaService;
 
     private static final Logger log = LoggerFactory.getLogger(AdminService.class);
 
@@ -772,4 +776,38 @@ public class AdminService {
             throw new RuntimeException("Erro ao reiniciar serviços: " + e.getMessage(), e);
         }
     }
+
+    // ===== MÉTODOS DE CONFIGURAÇÕES =====
+
+    public List<ConfiguracaoSistemaDTO> getConfiguracoesSistema() {
+        // Retorna configurações do banco de dados (já inicializadas automaticamente)
+        return configuracaoSistemaService.getTodasConfiguracoes();
+    }
+
+    public ConfiguracaoSistemaDTO getConfiguracao(String chave) {
+        return configuracaoSistemaService.getConfiguracao(chave).orElse(null);
+    }
+
+    public boolean atualizarConfiguracao(String chave, String novoValor) {
+        try {
+            configuracaoSistemaService.atualizarConfiguracao(chave, novoValor, "admin");
+            log.info("Configuração atualizada: {} = {}", chave, novoValor);
+            return true;
+        } catch (Exception e) {
+            log.error("Erro ao atualizar configuração {}: {}", chave, e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean resetarConfiguracoes() {
+        try {
+            configuracaoSistemaService.resetarConfiguracoes("admin");
+            log.info("Configurações resetadas para valores padrão");
+            return true;
+        } catch (Exception e) {
+            log.error("Erro ao resetar configurações: {}", e.getMessage());
+            return false;
+        }
+    }
+
 }

@@ -3,6 +3,7 @@ package com.ifclass.ifclass.admin.controller;
 import com.ifclass.ifclass.admin.dto.EstatisticasAdminDTO;
 import com.ifclass.ifclass.admin.dto.LogSistemaDTO;
 import com.ifclass.ifclass.admin.dto.MonitoramentoSistemaDTO;
+import com.ifclass.ifclass.admin.dto.ConfiguracaoSistemaDTO;
 import com.ifclass.ifclass.admin.service.AdminService;
 import com.ifclass.ifclass.common.service.ExcelExportService;
 import org.springframework.core.io.InputStreamResource;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -156,6 +158,71 @@ public class AdminController {
             return ResponseEntity.ok(resultado);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Erro ao otimizar banco: " + e.getMessage());
+        }
+    }
+
+    // ===== ENDPOINTS DE CONFIGURAÇÕES =====
+
+    @GetMapping("/configuracoes")
+    public ResponseEntity<List<ConfiguracaoSistemaDTO>> getConfiguracoes() {
+        try {
+            List<ConfiguracaoSistemaDTO> configuracoes = adminService.getConfiguracoesSistema();
+            return ResponseEntity.ok(configuracoes);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/configuracoes/{chave}")
+    public ResponseEntity<ConfiguracaoSistemaDTO> getConfiguracao(@PathVariable String chave) {
+        try {
+            ConfiguracaoSistemaDTO configuracao = adminService.getConfiguracao(chave);
+            if (configuracao != null) {
+                return ResponseEntity.ok(configuracao);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @PutMapping("/configuracoes/{chave}")
+    public ResponseEntity<Map<String, Object>> atualizarConfiguracao(
+            @PathVariable String chave, 
+            @RequestBody Map<String, String> request) {
+        try {
+            String novoValor = request.get("valor");
+            boolean sucesso = adminService.atualizarConfiguracao(chave, novoValor);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("sucesso", sucesso);
+            response.put("mensagem", sucesso ? "Configuração atualizada com sucesso" : "Erro ao atualizar configuração");
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("sucesso", false);
+            response.put("mensagem", "Erro interno: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @PostMapping("/configuracoes/reset")
+    public ResponseEntity<Map<String, Object>> resetarConfiguracoes() {
+        try {
+            boolean sucesso = adminService.resetarConfiguracoes();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("sucesso", sucesso);
+            response.put("mensagem", sucesso ? "Configurações resetadas com sucesso" : "Erro ao resetar configurações");
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("sucesso", false);
+            response.put("mensagem", "Erro interno: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
         }
     }
 }
