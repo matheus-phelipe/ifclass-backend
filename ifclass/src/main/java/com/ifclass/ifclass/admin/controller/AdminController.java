@@ -131,19 +131,31 @@ public class AdminController {
 
     @PostMapping("/sistema/restart")
     public ResponseEntity<String> reiniciarServicos() {
-        // Simular reinicialização de serviços
-        return ResponseEntity.ok("Serviços reiniciados com sucesso");
+        try {
+            String resultado = adminService.reiniciarServicosReal();
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao reiniciar serviços: " + e.getMessage());
+        }
     }
 
     @PostMapping("/sistema/cache/clear")
     public ResponseEntity<String> limparCache() {
-        // Simular limpeza de cache
-        return ResponseEntity.ok("Cache limpo com sucesso");
+        try {
+            String resultado = adminService.limparCacheReal();
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao limpar cache: " + e.getMessage());
+        }
     }
 
     @PostMapping("/sistema/database/optimize")
     public ResponseEntity<String> otimizarBanco() {
-        // Simular otimização do banco
-        return ResponseEntity.ok("Banco de dados otimizado com sucesso");
+        try {
+            String resultado = adminService.otimizarBancoReal();
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao otimizar banco: " + e.getMessage());
+        }
     }
 }

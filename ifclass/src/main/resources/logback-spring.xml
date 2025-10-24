@@ -47,13 +47,13 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <!-- Logger para SQL (apenas em desenvolvimento) -->
-    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+    <!-- Logger para SQL (desabilitado) -->
+    <logger name="org.hibernate.SQL" level="WARN" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <!-- Logger para parâmetros SQL (apenas em desenvolvimento) -->
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" additivity="false">
+    <!-- Logger para parâmetros SQL (desabilitado) -->
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
