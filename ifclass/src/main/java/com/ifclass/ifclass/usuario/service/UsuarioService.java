@@ -5,6 +5,7 @@ import com.ifclass.ifclass.usuario.model.dto.LoginDTO;
 import com.ifclass.ifclass.usuario.model.dto.RoleUsuario;
 import com.ifclass.ifclass.usuario.model.dto.UsuarioDetalhesDTO;
 import com.ifclass.ifclass.usuario.repository.UsuarioRepository;
+import com.ifclass.ifclass.util.log.AppLogger;
 import com.ifclass.ifclass.disciplina.model.Disciplina;
 import com.ifclass.ifclass.disciplina.repository.DisciplinaRepository;
 import com.ifclass.ifclass.alunoTurma.repository.AlunoTurmaRepository;
@@ -26,6 +27,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
+
+    @Autowired
+    private AppLogger appLogger;
 
     @Autowired
     private UsuarioRepository repository;
@@ -92,6 +96,7 @@ public class UsuarioService {
     @CacheEvict(value = "usuarios", allEntries = true)
     public Usuario cadastrar(Usuario usuario) {
         if (repository.findByEmail(usuario.getEmail()).isPresent()) {
+            appLogger.logCrudWarning("Usuario", "CRIACAO", "Tentativa de cadastrar com email já existente: " + usuario.getEmail());
             throw new IllegalArgumentException("Email já cadastrado");
         }
 
@@ -103,7 +108,9 @@ public class UsuarioService {
             usuario.setAuthorities(Collections.singletonList(RoleUsuario.ROLE_ALUNO.toString()));
         }
 
-        repository.save(usuario);
+        Usuario usuarioSalvo = repository.save(usuario);
+        appLogger.logCrudSuccess("Usuario", "CRIACAO", "ID: " + usuarioSalvo.getId() + ", Email: " + usuarioSalvo.getEmail());
+
         usuario.setSenha(null);
 
         return usuario;
@@ -112,9 +119,16 @@ public class UsuarioService {
 
     @CacheEvict(value = "usuarios", allEntries = true)
     public void excluir(Long id) {
-        Usuario usuario = repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
-        repository.delete(usuario);
+        Optional<Usuario> usuarioOpt = repository.findById(id);
+
+        if (usuarioOpt.isEmpty()) {
+            appLogger.logCrudWarning("Usuario", "DELECAO", "Tentativa de excluir usuário não encontrado com ID: " + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
+        }
+
+        repository.delete(usuarioOpt.get());
+        
+        appLogger.logCrudSuccess("Usuario", "DELECAO", "ID: " + id);
     }
 
     @Cacheable(value = "usuarios", key = "#login.email")

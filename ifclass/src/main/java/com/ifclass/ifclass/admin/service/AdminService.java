@@ -14,7 +14,6 @@ import com.ifclass.ifclass.common.service.PerformanceMonitoringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
@@ -172,61 +171,90 @@ public class AdminService {
     }
 
     public List<LogSistemaDTO> getLogsSistema() {
-        // Simulação de logs mais realistas - em produção, isso viria de um sistema de logging real
         List<LogSistemaDTO> logs = new ArrayList<>();
+        List<String> arquivos = List.of(
+            "logs/ifclass.log",
+            "logs/security.log"
+        );
 
-        // Gerar logs dinâmicos baseados no tempo atual
-        LocalDateTime agora = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        long id = 1;
 
-        // Log mais recente (sempre novo)
-        logs.add(new LogSistemaDTO(1L, agora.minusSeconds(30), "INFO", "SYSTEM",
-            "Monitoramento ativo", "system", "localhost", "Sistema funcionando normalmente"));
+         java.util.regex.Pattern datePattern = java.util.regex.Pattern.compile("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})");
 
-        logs.add(new LogSistemaDTO(2L, agora.minusMinutes(1), "INFO", "API",
-            "Requisição processada", "admin@ifclass.com", "192.168.1.100", "GET /api/admin/logs"));
+        for (String arquivo : arquivos) {
+            Path path = Paths.get(arquivo);
+            if (!Files.exists(path)) continue;
 
-        logs.add(new LogSistemaDTO(3L, agora.minusMinutes(2), "INFO", "AUTH",
-            "Sessão validada", "admin@ifclass.com", "192.168.1.100", "Token JWT válido"));
+            try {
+                List<String> linhas = Files.readAllLines(path);
 
-        logs.add(new LogSistemaDTO(4L, agora.minusMinutes(3), "INFO", "CRUD",
-            "Dados consultados", "admin@ifclass.com", "192.168.1.100", "Consulta de estatísticas"));
+                for (String linha : linhas) {
+                java.util.regex.Matcher matcher = datePattern.matcher(linha);
+                if (matcher.find()) {
+                    try {
+                        String dataStr = matcher.group(1);
+                        LocalDateTime dataLog = LocalDateTime.parse(dataStr, formatter);
+                        String restoDaLinha = linha.substring(matcher.end()).trim();
+                        
+                        String thread = "main";
+                        String nivel, mensagem, categoria, usuario = "system", ip = "localhost", detalhes = "";
 
-        logs.add(new LogSistemaDTO(5L, LocalDateTime.now().minusMinutes(15), "INFO", "AUTH",
-            "Usuário logado com sucesso", "professor@ifclass.com", "192.168.1.102", "Login realizado via mobile"));
+                        if (linha.contains("[")) { // Formato ifclass.log
+                            String[] partes = restoDaLinha.split(" ", 4);
+                            if (partes.length < 4) continue;
+                            thread = partes[0].replace("[", "").replace("]", "");
+                            nivel = partes[1];
+                            mensagem = partes[3];
+                            String lowerCaseLine = linha.toLowerCase();
 
-        logs.add(new LogSistemaDTO(6L, LocalDateTime.now().minusMinutes(18), "INFO", "CRUD",
-            "Sala atualizada", "admin@ifclass.com", "192.168.1.100", "Sala A101 - Capacidade alterada"));
-
-        logs.add(new LogSistemaDTO(7L, LocalDateTime.now().minusMinutes(22), "DEBUG", "API",
-            "Requisição processada", "system", "192.168.1.103", "GET /api/aulas - 200ms"));
-
-        logs.add(new LogSistemaDTO(8L, LocalDateTime.now().minusMinutes(25), "INFO", "CRUD",
-            "Novo usuário cadastrado", "admin@ifclass.com", "192.168.1.100", "Professor João Silva"));
-
-        logs.add(new LogSistemaDTO(9L, LocalDateTime.now().minusMinutes(30), "WARN", "AUTH",
-            "Tentativa de login falhada", "unknown", "192.168.1.200", "Email: teste@teste.com - 3ª tentativa"));
-
-        logs.add(new LogSistemaDTO(10L, LocalDateTime.now().minusMinutes(35), "ERROR", "DATABASE",
-            "Timeout na consulta", "system", "localhost", "Query: SELECT * FROM aulas - Timeout: 30s"));
-
-        logs.add(new LogSistemaDTO(11L, LocalDateTime.now().minusMinutes(40), "INFO", "AUTH",
-            "Usuário deslogado", "coordenador@ifclass.com", "192.168.1.101", "Logout por inatividade"));
-
-        logs.add(new LogSistemaDTO(12L, LocalDateTime.now().minusMinutes(45), "INFO", "SYSTEM",
-            "Sistema iniciado", "system", "localhost", "IFClass v1.0.0 - Startup completo"));
-
-        // Logs mais antigos (para testar funcionalidade de limpeza)
-        logs.add(new LogSistemaDTO(13L, LocalDateTime.now().minusHours(3), "INFO", "AUTH",
-            "Usuário logado", "admin@ifclass.com", "192.168.1.100", "Login matinal"));
-
-        logs.add(new LogSistemaDTO(14L, LocalDateTime.now().minusHours(4), "ERROR", "SYSTEM",
-            "Erro crítico resolvido", "system", "localhost", "Reinicialização automática executada"));
-
-        logs.add(new LogSistemaDTO(15L, LocalDateTime.now().minusHours(6), "INFO", "BACKUP",
-            "Backup semanal", "system", "localhost", "Backup completo do banco de dados"));
-
-        return logs;
+                            if (lowerCaseLine.contains("org.hibernate") || lowerCaseLine.contains("hikari") || lowerCaseLine.contains("database") || lowerCaseLine.contains(" jpa ") || lowerCaseLine.contains(" sql ")) {
+                                categoria = "Database";
+                            } else if (lowerCaseLine.contains("tomcat") || lowerCaseLine.contains("coyote") || lowerCaseLine.contains("http-nio") || lowerCaseLine.contains("network")) {
+                                categoria = "Network";
+                            } else {
+                                categoria = "Application";
+                            }
+                        } else { // Formato security.log
+                            String[] partes = restoDaLinha.split(" - ", 2);
+                            if (partes.length < 2) continue;
+                            nivel = partes[0].trim();
+                            mensagem = partes[1].trim();
+                            
+                            String[] partesMensagem = mensagem.split(" \\| ");
+                            categoria = "Security";
+                            
+                            for (String detalhe : partesMensagem) {
+                                if (detalhe.trim().startsWith("Email:")) usuario = detalhe.split(":")[1].trim();
+                                else if (detalhe.trim().startsWith("IP:")) ip = detalhe.split(":")[1].trim();
+                                else if (detalhe.trim().startsWith("Token:")) detalhes = detalhe.split(":")[1].trim();
+                            }
+                        }
+                        String nivelOriginal = nivel;
+                        switch (nivelOriginal.toUpperCase()) {
+                            case "ERROR":
+                            case "WARN":
+                            case "INFO":
+                            case "DEBUG":
+                                break;
+                            default:
+                                // Converte qualquer outro nível (WATCHER, CONNECTING, etc.) para INFO
+                                nivel = "INFO";
+                                break;
+                        }
+                        logs.add(new LogSistemaDTO(id++, dataLog, nivel, categoria, mensagem, usuario, ip, detalhes));
+                    } catch (Exception e) {
+                        System.err.println("Erro ao processar linha de log: " + linha + " | Erro: " + e.getMessage());
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+    logs.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
+    return logs;
+}
 
     public String criarBackupReal() throws IOException {
         // Criar diretório de backup se não existir
