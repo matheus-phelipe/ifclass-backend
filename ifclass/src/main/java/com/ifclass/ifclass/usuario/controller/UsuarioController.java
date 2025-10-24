@@ -60,12 +60,29 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody Usuario usuario) {
         try {
+            // Validações básicas
+            if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
+                return ResponseEntity.status(400).body(Map.of("error", "Email é obrigatório"));
+            }
+            if (usuario.getProntuario() == null || usuario.getProntuario().trim().isEmpty()) {
+                return ResponseEntity.status(400).body(Map.of("error", "Prontuário é obrigatório"));
+            }
+            if (usuario.getNome() == null || usuario.getNome().trim().isEmpty()) {
+                return ResponseEntity.status(400).body(Map.of("error", "Nome é obrigatório"));
+            }
+            if (usuario.getSenha() == null || usuario.getSenha().trim().isEmpty()) {
+                return ResponseEntity.status(400).body(Map.of("error", "Senha é obrigatória"));
+            }
+
             Usuario novoUsuario = service.cadastrar(usuario);
             return ResponseEntity.status(201).body(novoUsuario);
         } catch (IllegalArgumentException e) {
+            System.out.println("IllegalArgumentException capturada: " + e.getMessage());
             return ResponseEntity.status(409).body(Map.of("error", e.getMessage())); // 409 Conflict
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("error", "Erro interno"));
+            System.out.println("Exception capturada: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", "Erro interno: " + e.getMessage()));
         }
     }
 
@@ -120,6 +137,16 @@ public class UsuarioController {
             return ResponseEntity.noContent().build();
         } catch (ResponseStatusException ex) {
             return ResponseEntity.status(ex.getStatusCode()).build();
+        }
+    }
+
+    @PostMapping("/clean-duplicates")
+    public ResponseEntity<?> limparDuplicados() {
+        try {
+            service.limparProntuariosDuplicados();
+            return ResponseEntity.ok(Map.of("message", "Prontuários duplicados removidos com sucesso"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "Erro ao limpar duplicados: " + e.getMessage()));
         }
     }
 

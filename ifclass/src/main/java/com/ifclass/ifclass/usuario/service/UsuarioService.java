@@ -18,6 +18,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
@@ -105,8 +106,14 @@ public class UsuarioService {
         }
 
         // Verificar se já existe usuário com o mesmo prontuário
-        if (repository.findByProntuario(usuario.getProntuario()).isPresent()) {
-            appLogger.logCrudWarning("Usuario", "CRIACAO", "Tentativa de cadastrar com prontuário já existente: " + usuario.getProntuario());
+        try {
+            if (repository.findByProntuario(usuario.getProntuario()).isPresent()) {
+                appLogger.logCrudWarning("Usuario", "CRIACAO", "Tentativa de cadastrar com prontuário já existente: " + usuario.getProntuario());
+                throw new IllegalArgumentException("Prontuário já cadastrado");
+            }
+        } catch (Exception e) {
+            // Se houver múltiplos resultados, também é considerado duplicado
+            appLogger.logCrudWarning("Usuario", "CRIACAO", "Múltiplos usuários com prontuário: " + usuario.getProntuario());
             throw new IllegalArgumentException("Prontuário já cadastrado");
         }
 
@@ -197,17 +204,48 @@ public class UsuarioService {
         });
 
         // Verificar se já existe outro usuário com o mesmo prontuário
-        repository.findByProntuario(usuarioAtualizado.getProntuario()).ifPresent(u -> {
-            if (!u.getId().equals(id)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Prontuário já está em uso");
-            }
-        });
+        try {
+            repository.findByProntuario(usuarioAtualizado.getProntuario()).ifPresent(u -> {
+                if (!u.getId().equals(id)) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Prontuário já está em uso");
+                }
+            });
+        } catch (Exception e) {
+            // Se houver múltiplos resultados, também é considerado duplicado
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Prontuário já está em uso");
+        }
 
         usuario.setNome(usuarioAtualizado.getNome());
         usuario.setEmail(usuarioAtualizado.getEmail());
         usuario.setProntuario(usuarioAtualizado.getProntuario());
 
         return repository.save(usuario);
+    }
+
+    @Transactional
+    public void limparProntuariosDuplicados() {
+        // Buscar prontuários duplicados
+        List<Object[]> duplicados = repository.findProntuariosDuplicados();
+        
+        for (Object[] duplicado : duplicados) {
+            String prontuario = (String) duplicado[0];
+            Long count = (Long) duplicado[1];
+            
+            if (count > 1) {
+                // Buscar todos os usuários com este prontuário
+                List<Usuario> usuariosComProntuario = repository.findUsuariosByProntuario(prontuario);
+                
+                // Manter apenas o mais recente (maior ID) e remover os outros
+                usuariosComProntuario.sort((u1, u2) -> Long.compare(u2.getId(), u1.getId()));
+                
+                // Remover todos exceto o primeiro (mais recente)
+                for (int i = 1; i < usuariosComProntuario.size(); i++) {
+                    Usuario usuarioParaRemover = usuariosComProntuario.get(i);
+                    repository.delete(usuarioParaRemover);
+                    appLogger.logCrudSuccess("Usuario", "LIMPEZA", "Usuário duplicado removido: ID " + usuarioParaRemover.getId() + ", Prontuário: " + prontuario);
+                }
+            }
+        }
     }
 
     public void vincularDisciplina(Long professorId, Long disciplinaId) {
