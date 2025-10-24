@@ -104,6 +104,12 @@ public class UsuarioService {
             throw new IllegalArgumentException("Email já cadastrado");
         }
 
+        // Verificar se já existe usuário com o mesmo prontuário
+        if (repository.findByProntuario(usuario.getProntuario()).isPresent()) {
+            appLogger.logCrudWarning("Usuario", "CRIACAO", "Tentativa de cadastrar com prontuário já existente: " + usuario.getProntuario());
+            throw new IllegalArgumentException("Prontuário já cadastrado");
+        }
+
         var encoder = new BCryptPasswordEncoder();
         usuario.setSenha(encoder.encode(usuario.getSenha()));
 

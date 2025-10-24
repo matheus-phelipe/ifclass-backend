@@ -63,9 +63,9 @@ public class UsuarioController {
             Usuario novoUsuario = service.cadastrar(usuario);
             return ResponseEntity.status(201).body(novoUsuario);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(409).body(e.getMessage()); // 409 Conflict
+            return ResponseEntity.status(409).body(Map.of("error", e.getMessage())); // 409 Conflict
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Erro interno");
+            return ResponseEntity.status(500).body(Map.of("error", "Erro interno"));
         }
     }
 
@@ -109,7 +109,7 @@ public class UsuarioController {
             Usuario atualizado = service.atualizarUsuario(id, usuarioAtualizado);
             return ResponseEntity.ok(atualizado);
         } catch (ResponseStatusException ex) {
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
+            return ResponseEntity.status(ex.getStatusCode()).body(Map.of("error", ex.getReason()));
         }
     }
 
