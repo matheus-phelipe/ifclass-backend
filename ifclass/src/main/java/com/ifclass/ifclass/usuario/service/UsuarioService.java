@@ -5,10 +5,12 @@ import com.ifclass.ifclass.usuario.model.dto.LoginDTO;
 import com.ifclass.ifclass.usuario.model.dto.RoleUsuario;
 import com.ifclass.ifclass.usuario.model.dto.UsuarioDetalhesDTO;
 import com.ifclass.ifclass.usuario.repository.UsuarioRepository;
+import com.ifclass.ifclass.util.log.AppLogger;
 import com.ifclass.ifclass.disciplina.model.Disciplina;
 import com.ifclass.ifclass.disciplina.repository.DisciplinaRepository;
 import com.ifclass.ifclass.alunoTurma.repository.AlunoTurmaRepository;
 import com.ifclass.ifclass.alunoTurma.model.AlunoTurma;
+import com.ifclass.ifclass.admin.service.ConfiguracaoAplicacaoService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,6 +30,9 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     @Autowired
+    private AppLogger appLogger;
+
+    @Autowired
     private UsuarioRepository repository;
 
     @Autowired
@@ -35,10 +40,17 @@ public class UsuarioService {
 
     @Autowired
     private AlunoTurmaRepository alunoTurmaRepository;
+    
+    @Autowired
+    private ConfiguracaoAplicacaoService configuracaoService;
 
     @Cacheable(value = "usuarios", key = "'all'")
     public List<Usuario> listar() {
         return repository.findAllByAuthoritiesNotContaining("ROLE_ADMIN");
+    }
+
+    public List<Usuario> listarProfessores() {
+        return repository.findByAuthoritiesContaining("ROLE_PROFESSOR");
     }
 
     @Cacheable(value = "usuarios", key = "'detalhes'")
@@ -88,25 +100,39 @@ public class UsuarioService {
     @CacheEvict(value = "usuarios", allEntries = true)
     public Usuario cadastrar(Usuario usuario) {
         if (repository.findByEmail(usuario.getEmail()).isPresent()) {
+            appLogger.logCrudWarning("Usuario", "CRIACAO", "Tentativa de cadastrar com email já existente: " + usuario.getEmail());
             throw new IllegalArgumentException("Email já cadastrado");
         }
 
         var encoder = new BCryptPasswordEncoder();
         usuario.setSenha(encoder.encode(usuario.getSenha()));
 
-        usuario.setAuthorities(Collections.singletonList(RoleUsuario.ROLE_ALUNO.toString()));
+        // Se o front não mandar authorities, define padrão ROLE_ALUNO
+        if (usuario.getAuthorities() == null || usuario.getAuthorities().isEmpty()) {
+            usuario.setAuthorities(Collections.singletonList(RoleUsuario.ROLE_ALUNO.toString()));
+        }
 
-        repository.save(usuario);
+        Usuario usuarioSalvo = repository.save(usuario);
+        appLogger.logCrudSuccess("Usuario", "CRIACAO", "ID: " + usuarioSalvo.getId() + ", Email: " + usuarioSalvo.getEmail());
+
         usuario.setSenha(null);
 
         return usuario;
     }
 
+
     @CacheEvict(value = "usuarios", allEntries = true)
     public void excluir(Long id) {
-        Usuario usuario = repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
-        repository.delete(usuario);
+        Optional<Usuario> usuarioOpt = repository.findById(id);
+
+        if (usuarioOpt.isEmpty()) {
+            appLogger.logCrudWarning("Usuario", "DELECAO", "Tentativa de excluir usuário não encontrado com ID: " + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
+        }
+
+        repository.delete(usuarioOpt.get());
+        
+        appLogger.logCrudSuccess("Usuario", "DELECAO", "ID: " + id);
     }
 
     @Cacheable(value = "usuarios", key = "#login.email")
@@ -117,7 +143,24 @@ public class UsuarioService {
             Usuario usuario = usuarioOpt.get();
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
+            // Validar senha usando configurações do sistema
+            if (!configuracaoService.validarSenha(login.getSenha())) {
+                Integer tamanhoMinimo = configuracaoService.getTamanhoMinimoSenha();
+                if (tamanhoMinimo == null) tamanhoMinimo = 6; // valor padrão se configuração não existir
+                
+                appLogger.logServiceError("UsuarioService", "logar", 
+                    "Tentativa de login com senha inválida para usuário: " + login.getEmail());
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                    "Senha deve ter pelo menos " + tamanhoMinimo + " caracteres");
+            }
+
             if (encoder.matches(login.getSenha(), usuario.getSenha()) || login.getSenha().equals(usuario.getSenha())) {
+                // Log de debug se habilitado
+                if (configuracaoService.isModoDebug()) {
+                    appLogger.logCrudSuccess("Usuario", "LOGIN", 
+                        "Login realizado com sucesso: " + login.getEmail() + 
+                        " | Configurações: " + configuracaoService.getInformacoesDebug());
+                }
                 return Optional.of(usuario);
             }
         }

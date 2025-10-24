@@ -41,13 +41,19 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <!-- Logger para SQL (apenas em desenvolvimento) -->
-    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+     <!-- Logger para capturar logs do Spring Security -->
+    <logger name="org.springframework.security" level="INFO" additivity="false">
+        <appender-ref ref="SECURITY_FILE"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <!-- Logger para parâmetros SQL (apenas em desenvolvimento) -->
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" additivity="false">
+    <!-- Logger para SQL (desabilitado) -->
+    <logger name="org.hibernate.SQL" level="WARN" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- Logger para parâmetros SQL (desabilitado) -->
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
