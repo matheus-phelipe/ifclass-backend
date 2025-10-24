@@ -26,6 +26,8 @@ import java.lang.management.OperatingSystemMXBean;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -204,73 +206,92 @@ public class AdminService {
             if (!Files.exists(path)) continue;
 
             try {
-                List<String> linhas = Files.readAllLines(path);
-
-                for (String linha : linhas) {
-                java.util.regex.Matcher matcher = datePattern.matcher(linha);
-                if (matcher.find()) {
+                // Tentar diferentes codificações para evitar MalformedInputException
+                List<String> linhas = null;
+                try {
+                    // Primeiro tenta UTF-8
+                    linhas = Files.readAllLines(path, StandardCharsets.UTF_8);
+                } catch (Exception e) {
                     try {
-                        String dataStr = matcher.group(1);
-                        LocalDateTime dataLog = LocalDateTime.parse(dataStr, formatter);
-                        String restoDaLinha = linha.substring(matcher.end()).trim();
-                        
-                        String nivel, mensagem, categoria, usuario = "system", ip = "localhost", detalhes = "";
-
-                        if (linha.contains("[")) { // Formato ifclass.log
-                            String[] partes = restoDaLinha.split(" ", 4);
-                            if (partes.length < 4) continue;
-                            // thread = partes[0].replace("[", "").replace("]", "");
-                            nivel = partes[1];
-                            mensagem = partes[3];
-                            String lowerCaseLine = linha.toLowerCase();
-
-                            if (lowerCaseLine.contains("org.hibernate") || lowerCaseLine.contains("hikari") || lowerCaseLine.contains("database") || lowerCaseLine.contains(" jpa ") || lowerCaseLine.contains(" sql ")) {
-                                categoria = "Database";
-                            } else if (lowerCaseLine.contains("tomcat") || lowerCaseLine.contains("coyote") || lowerCaseLine.contains("http-nio") || lowerCaseLine.contains("network")) {
-                                categoria = "Network";
-                            } else {
-                                categoria = "Application";
-                            }
-                        } else { // Formato security.log
-                            String[] partes = restoDaLinha.split(" - ", 2);
-                            if (partes.length < 2) continue;
-                            nivel = partes[0].trim();
-                            mensagem = partes[1].trim();
-                            
-                            String[] partesMensagem = mensagem.split(" \\| ");
-                            categoria = "Security";
-                            
-                            for (String detalhe : partesMensagem) {
-                                if (detalhe.trim().startsWith("Email:")) usuario = detalhe.split(":")[1].trim();
-                                else if (detalhe.trim().startsWith("IP:")) ip = detalhe.split(":")[1].trim();
-                                else if (detalhe.trim().startsWith("Token:")) detalhes = detalhe.split(":")[1].trim();
-                            }
+                        // Se falhar, tenta ISO-8859-1
+                        linhas = Files.readAllLines(path, StandardCharsets.ISO_8859_1);
+                    } catch (Exception e2) {
+                        try {
+                            // Se falhar, tenta Windows-1252
+                            linhas = Files.readAllLines(path, Charset.forName("Windows-1252"));
+                        } catch (Exception e3) {
+                            // Se tudo falhar, pula o arquivo
+                            System.err.println("Erro ao ler arquivo de log " + arquivo + ": " + e3.getMessage());
+                            continue;
                         }
-                        String nivelOriginal = nivel;
-                        switch (nivelOriginal.toUpperCase()) {
-                            case "ERROR":
-                            case "WARN":
-                            case "INFO":
-                            case "DEBUG":
-                                break;
-                            default:
-                                // Converte qualquer outro nível (WATCHER, CONNECTING, etc.) para INFO
-                                nivel = "INFO";
-                                break;
-                        }
-                        logs.add(new LogSistemaDTO(id++, dataLog, nivel, categoria, mensagem, usuario, ip, detalhes));
-                    } catch (Exception e) {
-                        System.err.println("Erro ao processar linha de log: " + linha + " | Erro: " + e.getMessage());
                     }
                 }
+
+                for (String linha : linhas) {
+                    java.util.regex.Matcher matcher = datePattern.matcher(linha);
+                    if (matcher.find()) {
+                        try {
+                            String dataStr = matcher.group(1);
+                            LocalDateTime dataLog = LocalDateTime.parse(dataStr, formatter);
+                            String restoDaLinha = linha.substring(matcher.end()).trim();
+                            
+                            String nivel, mensagem, categoria, usuario = "system", ip = "localhost", detalhes = "";
+
+                            if (linha.contains("[")) { // Formato ifclass.log
+                                String[] partes = restoDaLinha.split(" ", 4);
+                                if (partes.length < 4) continue;
+                                // thread = partes[0].replace("[", "").replace("]", "");
+                                nivel = partes[1];
+                                mensagem = partes[3];
+                                String lowerCaseLine = linha.toLowerCase();
+
+                                if (lowerCaseLine.contains("org.hibernate") || lowerCaseLine.contains("hikari") || lowerCaseLine.contains("database") || lowerCaseLine.contains(" jpa ") || lowerCaseLine.contains(" sql ")) {
+                                    categoria = "Database";
+                                } else if (lowerCaseLine.contains("tomcat") || lowerCaseLine.contains("coyote") || lowerCaseLine.contains("http-nio") || lowerCaseLine.contains("network")) {
+                                    categoria = "Network";
+                                } else {
+                                    categoria = "Application";
+                                }
+                            } else { // Formato security.log
+                                String[] partes = restoDaLinha.split(" - ", 2);
+                                if (partes.length < 2) continue;
+                                nivel = partes[0].trim();
+                                mensagem = partes[1].trim();
+                                
+                                String[] partesMensagem = mensagem.split(" \\| ");
+                                categoria = "Security";
+                                
+                                for (String detalhe : partesMensagem) {
+                                    if (detalhe.trim().startsWith("Email:")) usuario = detalhe.split(":")[1].trim();
+                                    else if (detalhe.trim().startsWith("IP:")) ip = detalhe.split(":")[1].trim();
+                                    else if (detalhe.trim().startsWith("Token:")) detalhes = detalhe.split(":")[1].trim();
+                                }
+                            }
+                            String nivelOriginal = nivel;
+                            switch (nivelOriginal.toUpperCase()) {
+                                case "ERROR":
+                                case "WARN":
+                                case "INFO":
+                                case "DEBUG":
+                                    break;
+                                default:
+                                    // Converte qualquer outro nível (WATCHER, CONNECTING, etc.) para INFO
+                                    nivel = "INFO";
+                                    break;
+                            }
+                            logs.add(new LogSistemaDTO(id++, dataLog, nivel, categoria, mensagem, usuario, ip, detalhes));
+                        } catch (Exception e) {
+                            System.err.println("Erro ao processar linha de log: " + linha + " | Erro: " + e.getMessage());
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Erro ao processar arquivo de log " + arquivo + ": " + e.getMessage());
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        logs.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
+        return logs;
     }
-    logs.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
-    return logs;
-}
 
     public String criarBackupReal() throws IOException {
         // Criar diretório de backup se não existir
