@@ -55,13 +55,15 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
         } else {
-            // Libera login ou cadastro, bloqueia o resto
+            // Libera login, cadastro, e rotas públicas do mapa
             if (!request.getRequestURI().contains("/auth") &&
                     !request.getRequestURI().equals("/api/usuarios") &&
                     !request.getRequestURI().contains("/usuarios/login") &&
                     !request.getRequestURI().contains("/usuarios/request-password-reset") &&
                     !request.getRequestURI().contains("/usuarios/reset-password") &&
-                    !request.getRequestURI().contains("/relatorios") ) {
+                    !request.getRequestURI().contains("/relatorios") &&
+                    !request.getRequestURI().contains("/api/blocos") &&
+                    !request.getRequestURI().contains("/api/aulas") ) {
 
                 // Log de tentativa de acesso não autorizado
                 securityLogger.logUnauthorizedAccess(
